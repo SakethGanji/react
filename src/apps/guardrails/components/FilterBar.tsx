@@ -74,16 +74,24 @@ export function FilterBar() {
               id="start-date"
               type="date"
               className="filter-date"
+              aria-label="Start date"
               value={filters.dateRange.start ?? ''}
-              onChange={(e) => setDateRange(e.target.value || null, filters.dateRange.end)}
+              onChange={(e) => {
+                const newStart = e.target.value || null
+                setDateRange(newStart, filters.dateRange.end)
+              }}
             />
             <span className="date-separator">to</span>
             <input
               id="end-date"
               type="date"
               className="filter-date"
+              aria-label="End date"
               value={filters.dateRange.end ?? ''}
-              onChange={(e) => setDateRange(filters.dateRange.start, e.target.value || null)}
+              onChange={(e) => {
+                const newEnd = e.target.value || null
+                setDateRange(filters.dateRange.start, newEnd)
+              }}
             />
           </div>
         </div>

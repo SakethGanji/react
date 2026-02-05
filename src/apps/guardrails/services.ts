@@ -74,7 +74,11 @@ export async function fetchCharts(filters: DashboardFilters): Promise<ChartData[
   const response = await fetch(`${backends.dashboard}/api/charts${buildQueryParams(filters)}`)
   if (!response.ok) throw new Error('Failed to fetch charts')
   const data: ChartResponse[] = await response.json()
-  return data.map((c) => ({ ...c, icon: getIcon(c.icon) }))
+  return data.map((c) => ({
+    ...c,
+    icon: getIcon(c.icon),
+    stackedSeries: c.stackedSeries,
+  }))
 }
 
 export async function fetchGeneralSettings(): Promise<GeneralSettings> {

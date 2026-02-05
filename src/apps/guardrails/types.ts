@@ -3,14 +3,14 @@ import { LucideIcon } from 'lucide-react'
 export interface MetricResponse {
   label: string
   value: string
-  growth: string
+  growth: number
   icon: string
 }
 
 export interface Metric {
   label: string
   value: string
-  growth: string
+  growth: number
   icon: LucideIcon
 }
 
@@ -29,12 +29,18 @@ export interface TableRow {
   status: 'active' | 'scaling' | 'review'
 }
 
+export interface StackedSeries {
+  name: string
+  data: number[]
+}
+
 export interface ChartResponse {
   title: string
   subtitle: string
   icon: string
   type: 'line' | 'bar'
   data: number[]
+  stackedSeries?: StackedSeries[]
 }
 
 export interface ChartData {
@@ -43,6 +49,7 @@ export interface ChartData {
   icon: LucideIcon
   type: 'line' | 'bar'
   data: number[]
+  stackedSeries?: StackedSeries[]
 }
 
 // Filter types

@@ -1,22 +1,12 @@
 import type { ChartData } from '../types'
 import { LineChart, StackedBarChart, AreaChart } from '@/shared/charts'
 
-export function EChartsChart({ title, subtitle, icon: Icon, type, data }: ChartData) {
-  // For bar charts, create 6 stacked series from the data
-  const stackedSeries = type === 'bar' ? [
-    { name: 'Active', data: data.map(v => Math.round(v * 0.30)) },
-    { name: 'Pending', data: data.map(v => Math.round(v * 0.20)) },
-    { name: 'Queued', data: data.map(v => Math.round(v * 0.15)) },
-    { name: 'Processing', data: data.map(v => Math.round(v * 0.15)) },
-    { name: 'Completed', data: data.map(v => Math.round(v * 0.12)) },
-    { name: 'Archived', data: data.map(v => Math.round(v * 0.08)) },
-  ] : []
-
+export function EChartsChart({ title, subtitle, icon: Icon, type, data, stackedSeries }: ChartData) {
   // Use different chart styles based on title
   const isGrowthTrend = title.toLowerCase().includes('growth')
 
   const renderChart = () => {
-    if (type === 'bar') {
+    if (type === 'bar' && stackedSeries && stackedSeries.length > 0) {
       return <StackedBarChart series={stackedSeries} height="100%" />
     }
     if (isGrowthTrend) {
