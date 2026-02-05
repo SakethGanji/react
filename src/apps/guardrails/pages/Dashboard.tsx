@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import {
   MetricCard,
   DataTable,
@@ -5,6 +6,7 @@ import {
   EChartsChart,
   EChartsPieChart,
   AlertContainer,
+  ConversationModal,
   MetricCardsSkeleton,
   PieChartsSkeleton,
   ChartsSkeleton,
@@ -12,6 +14,7 @@ import {
 } from '../components'
 import { useMetrics, useDistribution, useTableData, useCharts } from '../hooks'
 import { getErrorMessage } from '../errors'
+import type { TableRow } from '../types'
 
 function SectionError({ error }: { error: unknown }) {
   return <div className="section-error">{getErrorMessage(error)}</div>
@@ -22,6 +25,18 @@ export function Dashboard() {
   const distribution = useDistribution()
   const tableData = useTableData()
   const charts = useCharts()
+
+  // Modal state - stores the conversation ID to show in modal
+  const [selectedConversationId, setSelectedConversationId] = useState<string | null>(null)
+
+  const handleRowClick = (row: TableRow) => {
+    // Use row.id as the conversation ID to fetch details
+    setSelectedConversationId(row.id)
+  }
+
+  const handleCloseModal = () => {
+    setSelectedConversationId(null)
+  }
 
   return (
     <main className="dashboard-content">
@@ -61,7 +76,11 @@ export function Dashboard() {
         ) : tableData.error ? (
           <SectionError error={tableData.error} />
         ) : (
-          <DataTable title="Operational Log" data={tableData.data ?? []} />
+          <DataTable
+            title="Operational Log"
+            data={tableData.data ?? []}
+            onRowClick={handleRowClick}
+          />
         )}
       </section>
 
@@ -76,6 +95,14 @@ export function Dashboard() {
           ))
         )}
       </section>
+
+      {/* Conversation Detail Modal */}
+      {selectedConversationId && (
+        <ConversationModal
+          conversationId={selectedConversationId}
+          onClose={handleCloseModal}
+        />
+      )}
     </main>
   )
 }

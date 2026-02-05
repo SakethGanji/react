@@ -3,9 +3,12 @@ import type { TableRow } from '../types'
 interface DataTableProps {
   title: string
   data: TableRow[]
+  onRowClick?: (row: TableRow) => void
 }
 
-export function DataTable({ title, data }: DataTableProps) {
+export function DataTable({ title, data, onRowClick }: DataTableProps) {
+  const isClickable = !!onRowClick
+
   return (
     <div className="data-table">
       <div className="data-table-header">
@@ -28,7 +31,11 @@ export function DataTable({ title, data }: DataTableProps) {
           </thead>
           <tbody>
             {data.map((row) => (
-              <tr key={row.id}>
+              <tr
+                key={row.id}
+                onClick={() => onRowClick?.(row)}
+                className={isClickable ? 'data-table-row-clickable' : ''}
+              >
                 <td>{row.name}</td>
                 <td>{row.type}</td>
                 <td>{row.load}</td>

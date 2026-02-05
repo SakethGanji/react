@@ -208,3 +208,112 @@ export interface NotificationSettings {
   push: boolean
   frequency: string
 }
+
+// ============================================
+// Messages Table Types (Infinite Scroll)
+// ============================================
+
+export interface LlmMetadata {
+  response_id: string
+  r2d2_request_id: string
+}
+
+export interface GuardrailResult {
+  Result: string
+  Score: number
+  Reason: string
+  Time_Token?: string
+  llm_metadata?: LlmMetadata
+}
+
+export interface GuardrailResults {
+  'Input Guardrails'?: GuardrailResult
+  'Contextual Relevancy'?: GuardrailResult
+  'Bias and Fairness'?: GuardrailResult
+  'Hallucination'?: GuardrailResult
+  'Factual Accuracy'?: GuardrailResult
+  'Output Moderation'?: GuardrailResult
+}
+
+export interface MessageRow {
+  conversation_id: string
+  timestamp: string
+  job: string
+  intent: string
+  user_utterance: string
+  model_response_text: string
+  total_model_time: number[]
+  topic: string[]
+  guardrail_results: GuardrailResults
+}
+
+export interface MessagesTablePagination {
+  limit: number
+  has_more: boolean
+  next_cursor: string | null
+}
+
+export interface MessagesTableFilters {
+  start_date: string
+  end_date: string
+  job: string | null
+  intent: string | null
+  text_search: string | null
+  conversation_id: string | null
+  sort_dir: 'asc' | 'desc'
+}
+
+export interface MessagesTableApiResponse {
+  llm_metadata: LlmMetadata
+  Hallucination?: GuardrailResult
+  'Factual Accuracy'?: GuardrailResult
+  'Output Moderation'?: GuardrailResult
+  external_guardrail_payload?: {
+    Result: string
+    Reason: string
+  }
+  pagination: MessagesTablePagination
+  filters: MessagesTableFilters
+  data: MessageRow[]
+}
+
+export interface MessagesTableParams {
+  start_date: string
+  end_date: string
+  limit?: number
+  sort_dir?: 'asc' | 'desc'
+  cursor?: string | null
+  job?: string | null
+  intent?: string | null
+  text_search?: string | null
+  conversation_id?: string | null
+}
+
+// ============================================
+// Conversation Detail Types (Modal)
+// ============================================
+
+export interface ConversationMessage {
+  role: 'user' | 'assistant'
+  content: string
+  timestamp: string
+  guardrail_results?: GuardrailResults
+}
+
+export interface ConversationDetail {
+  conversation_id: string
+  job: string
+  intent: string
+  topic: string[]
+  created_at: string
+  updated_at: string
+  messages: ConversationMessage[]
+  metadata?: Record<string, unknown>
+  summary?: {
+    total_messages: number
+    total_guardrail_triggers: number
+    blocked_count: number
+    delivered_count: number
+    avg_response_time?: number
+  }
+}

@@ -28,6 +28,9 @@ import type {
   GuardrailCategory,
   ChartsApiResponse,
   GuardrailTriggersDataPoint,
+  MessagesTableApiResponse,
+  MessagesTableParams,
+  ConversationDetail,
 } from './types'
 
 const iconMap: Record<string, LucideIcon> = {
@@ -282,6 +285,83 @@ export async function fetchNotificationSettings(): Promise<NotificationSettings>
   const endpoint = '/api/settings/notifications'
   try {
     const response = await fetch(`${backends.settings}${endpoint}`)
+    if (!response.ok) throw ApiError.fromResponse(response, endpoint)
+    return response.json()
+  } catch (error) {
+    if (error instanceof ApiError) throw error
+    throw ApiError.networkError(endpoint, error as Error)
+  }
+}
+
+// ============================================
+// Messages Table (Infinite Scroll)
+// ============================================
+
+// Build query params for messages table endpoint
+function buildMessagesTableParams(params: MessagesTableParams): string {
+  const searchParams = new URLSearchParams()
+
+  // Required params
+  searchParams.set('start_date', params.start_date)
+  searchParams.set('end_date', params.end_date)
+
+  // Optional params with defaults
+  searchParams.set('limit', String(params.limit ?? 100))
+  searchParams.set('sort_dir', params.sort_dir ?? 'desc')
+
+  // Cursor for pagination (if provided)
+  if (params.cursor) {
+    searchParams.set('cursor', params.cursor)
+  }
+
+  // Optional filter params
+  if (params.job) searchParams.set('job', params.job)
+  if (params.intent) searchParams.set('intent', params.intent)
+  if (params.text_search) searchParams.set('text_search', params.text_search)
+  if (params.conversation_id) searchParams.set('conversation_id', params.conversation_id)
+
+  return `?${searchParams.toString()}`
+}
+
+export async function fetchMessagesTable(
+  params: MessagesTableParams
+): Promise<MessagesTableApiResponse> {
+  const endpoint = '/api/messages/table'
+  try {
+    const response = await fetch(
+      `${backends.dashboard}${endpoint}${buildMessagesTableParams(params)}`
+    )
+    if (!response.ok) throw ApiError.fromResponse(response, endpoint)
+    return response.json()
+  } catch (error) {
+    if (error instanceof ApiError) throw error
+    throw ApiError.networkError(endpoint, error as Error)
+  }
+}
+
+// Helper to get next page params from current response
+export function getNextPageParams(
+  currentParams: MessagesTableParams,
+  response: MessagesTableApiResponse
+): MessagesTableParams | null {
+  if (!response.pagination.has_more || !response.pagination.next_cursor) {
+    return null
+  }
+
+  return {
+    ...currentParams,
+    cursor: response.pagination.next_cursor,
+  }
+}
+
+// ============================================
+// Conversation Detail (Modal)
+// ============================================
+
+export async function fetchConversation(conversationId: string): Promise<ConversationDetail> {
+  const endpoint = `/api/conversations/${conversationId}`
+  try {
+    const response = await fetch(`${backends.dashboard}${endpoint}`)
     if (!response.ok) throw ApiError.fromResponse(response, endpoint)
     return response.json()
   } catch (error) {

@@ -12,4 +12,18 @@ export type {
   DashboardFilters,
   GeneralSettings,
   NotificationSettings,
+  // Messages table types
+  MessageRow,
+  MessagesTableApiResponse,
+  MessagesTableParams,
+  MessagesTablePagination,
+  MessagesTableFilters,
+  GuardrailResult,
+  GuardrailResults,
+  // Conversation detail types
+  ConversationDetail,
+  ConversationMessage,
 } from './types'
+
+// Re-export hooks
+export { useMessagesTable, useFlattenedMessages, useConversation } from './hooks'
