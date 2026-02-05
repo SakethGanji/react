@@ -1,6 +1,6 @@
-import { useGeneralSettings, useNotificationSettings } from './hooks'
+import { useGeneralSettings, useNotificationSettings } from '../hooks'
 
-export function SettingsPage() {
+export function Settings() {
   const general = useGeneralSettings()
   const notifications = useNotificationSettings()
 

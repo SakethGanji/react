@@ -1,5 +1,12 @@
 import { useQuery } from '@tanstack/react-query'
-import { fetchMetrics, fetchDistribution, fetchTableData, fetchCharts } from './services'
+import {
+  fetchMetrics,
+  fetchDistribution,
+  fetchTableData,
+  fetchCharts,
+  fetchGeneralSettings,
+  fetchNotificationSettings,
+} from './services'
 import { useDashboardStore } from './store'
 import { DashboardFilters } from './types'
 
@@ -76,5 +83,19 @@ export function useCharts() {
   return useQuery({
     queryKey: ['charts', filtersToKey(filters)],
     queryFn: () => fetchCharts(filters),
+  })
+}
+
+export function useGeneralSettings() {
+  return useQuery({
+    queryKey: ['settings', 'general'],
+    queryFn: fetchGeneralSettings,
+  })
+}
+
+export function useNotificationSettings() {
+  return useQuery({
+    queryKey: ['settings', 'notifications'],
+    queryFn: fetchNotificationSettings,
   })
 }

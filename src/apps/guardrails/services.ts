@@ -10,8 +10,18 @@ import {
   LucideIcon,
   HelpCircle,
 } from 'lucide-react'
-import { backends } from '../../config/backends'
-import type { Metric, MetricResponse, Distribution, TableRow, ChartData, ChartResponse, DashboardFilters } from './types'
+import { backends } from '@/config/backends'
+import type {
+  Metric,
+  MetricResponse,
+  Distribution,
+  TableRow,
+  ChartData,
+  ChartResponse,
+  DashboardFilters,
+  GeneralSettings,
+  NotificationSettings,
+} from './types'
 
 const iconMap: Record<string, LucideIcon> = {
   Wallet,
@@ -65,4 +75,16 @@ export async function fetchCharts(filters: DashboardFilters): Promise<ChartData[
   if (!response.ok) throw new Error('Failed to fetch charts')
   const data: ChartResponse[] = await response.json()
   return data.map((c) => ({ ...c, icon: getIcon(c.icon) }))
+}
+
+export async function fetchGeneralSettings(): Promise<GeneralSettings> {
+  const response = await fetch(`${backends.settings}/api/settings/general`)
+  if (!response.ok) throw new Error('Failed to fetch general settings')
+  return response.json()
+}
+
+export async function fetchNotificationSettings(): Promise<NotificationSettings> {
+  const response = await fetch(`${backends.settings}/api/settings/notifications`)
+  if (!response.ok) throw new Error('Failed to fetch notification settings')
+  return response.json()
 }

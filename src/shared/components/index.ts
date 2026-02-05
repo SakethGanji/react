@@ -1,1 +1,2 @@
-export { NavigationBar } from './NavigationBar'
+export { AppSwitcher } from './AppSwitcher'
+export { AppNavigation } from './AppNavigation'

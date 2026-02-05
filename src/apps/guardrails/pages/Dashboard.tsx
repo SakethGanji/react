@@ -1,7 +1,7 @@
-import { MetricCard, DataTable, FilterBar, EChartsChart, EChartsPieChart } from './components'
-import { useMetrics, useDistribution, useTableData, useCharts } from './hooks'
+import { MetricCard, DataTable, FilterBar, EChartsChart, EChartsPieChart } from '../components'
+import { useMetrics, useDistribution, useTableData, useCharts } from '../hooks'
 
-export function GuardrailDashboardPage() {
+export function Dashboard() {
   const metrics = useMetrics()
   const distribution = useDistribution()
   const tableData = useTableData()

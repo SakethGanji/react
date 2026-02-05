@@ -79,3 +79,16 @@ export const STATUS_OPTIONS = [
   { value: 'scaling', label: 'Scaling' },
   { value: 'review', label: 'Review' },
 ]
+
+// Settings types
+export interface GeneralSettings {
+  siteName: string
+  language: string
+  timezone: string
+}
+
+export interface NotificationSettings {
+  email: boolean
+  push: boolean
+  frequency: string
+}
