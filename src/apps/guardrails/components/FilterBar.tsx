@@ -1,4 +1,4 @@
-import { useDraftFilters, useFilterActions, useIsDirty, useLastUpdated } from '../hooks'
+import { useDraftFilters, useFilterActions, useIsDirty, useLastUpdated, useAlerts } from '../hooks'
 import { CATEGORY_OPTIONS, STATUS_OPTIONS } from '../types'
 
 function formatLastUpdated(date: Date | null): string {
@@ -24,8 +24,19 @@ export function FilterBar() {
   const { setCategory, setStatus, setDateRange, applyFilters, resetFilters } = useFilterActions()
   const isDirty = useIsDirty()
   const lastUpdated = useLastUpdated()
+  const alerts = useAlerts()
 
   const hasActiveFilters = filters.category || filters.status || filters.dateRange.start || filters.dateRange.end
+
+  const handleApply = () => {
+    applyFilters()
+    alerts.success('Filters applied, refreshing data...')
+  }
+
+  const handleReset = () => {
+    resetFilters()
+    alerts.info('Filters reset to defaults')
+  }
 
   return (
     <div className="filter-bar">
@@ -99,14 +110,14 @@ export function FilterBar() {
         <div className="filter-actions">
           <button
             className={`filter-apply ${isDirty ? 'filter-apply-dirty' : ''}`}
-            onClick={applyFilters}
+            onClick={handleApply}
             disabled={!isDirty}
           >
             {isDirty ? 'Apply Filters' : 'Applied'}
           </button>
 
           {hasActiveFilters && (
-            <button className="filter-reset" onClick={resetFilters}>
+            <button className="filter-reset" onClick={handleReset}>
               Clear
             </button>
           )}

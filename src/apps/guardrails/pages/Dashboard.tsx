@@ -1,12 +1,20 @@
-import { MetricCard, DataTable, FilterBar, EChartsChart, EChartsPieChart } from '../components'
+import {
+  MetricCard,
+  DataTable,
+  FilterBar,
+  EChartsChart,
+  EChartsPieChart,
+  AlertContainer,
+  MetricCardsSkeleton,
+  PieChartsSkeleton,
+  ChartsSkeleton,
+  TableSkeleton,
+} from '../components'
 import { useMetrics, useDistribution, useTableData, useCharts } from '../hooks'
+import { getErrorMessage } from '../errors'
 
-function SectionLoading() {
-  return <div className="section-loading">Loading...</div>
-}
-
-function SectionError({ message }: { message: string }) {
-  return <div className="section-error">Error: {message}</div>
+function SectionError({ error }: { error: unknown }) {
+  return <div className="section-error">{getErrorMessage(error)}</div>
 }
 
 export function Dashboard() {
@@ -17,13 +25,14 @@ export function Dashboard() {
 
   return (
     <main className="dashboard-content">
+      <AlertContainer />
       <FilterBar />
 
       <section className="metrics-row">
         {metrics.isLoading ? (
-          <SectionLoading />
+          <MetricCardsSkeleton count={4} />
         ) : metrics.error ? (
-          <SectionError message={metrics.error.message} />
+          <SectionError error={metrics.error} />
         ) : (
           metrics.data?.map((metric) => (
             <MetricCard key={metric.label} {...metric} />
@@ -32,12 +41,12 @@ export function Dashboard() {
       </section>
 
       <section className="distribution-row">
-        <h2>Distribution</h2>
+        <h2>Guardrail Performance</h2>
         <div className="distribution-charts">
           {distribution.isLoading ? (
-            <SectionLoading />
+            <PieChartsSkeleton count={6} />
           ) : distribution.error ? (
-            <SectionError message={distribution.error.message} />
+            <SectionError error={distribution.error} />
           ) : (
             distribution.data?.map((item) => (
               <EChartsPieChart key={item.label} {...item} />
@@ -48,9 +57,9 @@ export function Dashboard() {
 
       <section className="table-section">
         {tableData.isLoading ? (
-          <SectionLoading />
+          <TableSkeleton rows={4} />
         ) : tableData.error ? (
-          <SectionError message={tableData.error.message} />
+          <SectionError error={tableData.error} />
         ) : (
           <DataTable title="Operational Log" data={tableData.data ?? []} />
         )}
@@ -58,9 +67,9 @@ export function Dashboard() {
 
       <section className="charts-row">
         {charts.isLoading ? (
-          <SectionLoading />
+          <ChartsSkeleton count={3} />
         ) : charts.error ? (
-          <SectionError message={charts.error.message} />
+          <SectionError error={charts.error} />
         ) : (
           charts.data?.map((chart) => (
             <EChartsChart key={chart.title} {...chart} />

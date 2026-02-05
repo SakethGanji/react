@@ -1,5 +1,6 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
+from typing import Optional
 
 app = FastAPI()
 
@@ -87,3 +88,144 @@ def get_general_settings():
 @app.get("/api/settings/notifications")
 def get_notification_settings():
     return {"email": True, "push": False, "frequency": "daily"}
+
+
+# New endpoints matching real backend format
+@app.get("/api/metrics/cards")
+def get_metric_cards(
+    start_date: Optional[str] = Query(None),
+    end_date: Optional[str] = Query(None),
+    lob: Optional[str] = Query(None),
+    topic: Optional[str] = Query(None),
+):
+    return {
+        "total_conversations": 7750,
+        "total_utterances": 21312,
+        "avg_turns_per_call": 2.75,
+        "avg_response_time": 0,
+        "avg_guardrail_time": 0,
+        "blocked_responses": 6798,
+        "delivered_responses": 14514,
+        "percentage_changes": {
+            "total_conversations": -45.4,
+            "blocked_responses": -30.98,
+            "delivered_responses": -48.5
+        },
+        "filters": {
+            "start": start_date,
+            "end": end_date,
+            "lob": lob,
+            "topic": topic
+        }
+    }
+
+
+@app.get("/api/metrics/guardrails")
+def get_guardrails(
+    start_date: Optional[str] = Query(None),
+    end_date: Optional[str] = Query(None),
+    lob: Optional[str] = Query(None),
+    topic: Optional[str] = Query(None),
+):
+    return {
+        "data": {
+            "input_guardrails": [
+                {"_id": "Delivered", "count": 18154},
+                {"_id": "Blocked", "count": 3158}
+            ],
+            "contextual_relevancy": [
+                {"_id": "Delivered", "count": 15234},
+                {"_id": "Blocked", "count": 6078}
+            ],
+            "bias_fairness": [
+                {"_id": "Delivered", "count": 19876},
+                {"_id": "Blocked", "count": 1436}
+            ],
+            "hallucination": [
+                {"_id": "Delivered", "count": 17543},
+                {"_id": "Blocked", "count": 3769}
+            ],
+            "factual_accuracy": [
+                {"_id": "Delivered", "count": 16892},
+                {"_id": "Blocked", "count": 4420}
+            ],
+            "output_moderation": [
+                {"_id": "Delivered", "count": 14514},
+                {"_id": "Blocked", "count": 6798}
+            ]
+        },
+        "filters": {
+            "start": start_date,
+            "end": end_date,
+            "lob": lob,
+            "topic": topic
+        }
+    }
+
+
+@app.get("/api/metrics/charts")
+def get_charts_metrics(
+    start_date: Optional[str] = Query(None),
+    end_date: Optional[str] = Query(None),
+    granularity: Optional[str] = Query("hour"),
+    chart_type: Optional[str] = Query("all"),
+    lob: Optional[str] = Query(None),
+    topic: Optional[str] = Query(None),
+):
+    return {
+        "charts": {
+            "request_volume": {
+                "chart_type": "bar",
+                "data": [
+                    {"timestamp": "2026-02-04T08:00:00", "value": 120},
+                    {"timestamp": "2026-02-04T09:00:00", "value": 245},
+                    {"timestamp": "2026-02-04T10:00:00", "value": 312},
+                    {"timestamp": "2026-02-04T11:00:00", "value": 287},
+                    {"timestamp": "2026-02-04T12:00:00", "value": 198},
+                    {"timestamp": "2026-02-04T13:00:00", "value": 356},
+                    {"timestamp": "2026-02-04T14:00:00", "value": 421},
+                    {"timestamp": "2026-02-04T15:00:00", "value": 389},
+                    {"timestamp": "2026-02-04T16:00:00", "value": 267},
+                    {"timestamp": "2026-02-04T17:00:00", "value": 145},
+                ]
+            },
+            "guardrail_triggers": {
+                "chart_type": "segmented_bar",
+                "data": [
+                    {"timestamp": "2026-02-04T08:00:00", "input_guardrails": 15, "contextual_relevancy": 8, "bias_fairness": 3, "hallucination": 12, "factual_accuracy": 6, "output_moderation": 10},
+                    {"timestamp": "2026-02-04T09:00:00", "input_guardrails": 22, "contextual_relevancy": 14, "bias_fairness": 5, "hallucination": 18, "factual_accuracy": 9, "output_moderation": 16},
+                    {"timestamp": "2026-02-04T10:00:00", "input_guardrails": 28, "contextual_relevancy": 19, "bias_fairness": 7, "hallucination": 24, "factual_accuracy": 12, "output_moderation": 21},
+                    {"timestamp": "2026-02-04T11:00:00", "input_guardrails": 25, "contextual_relevancy": 16, "bias_fairness": 6, "hallucination": 20, "factual_accuracy": 10, "output_moderation": 18},
+                    {"timestamp": "2026-02-04T12:00:00", "input_guardrails": 18, "contextual_relevancy": 11, "bias_fairness": 4, "hallucination": 15, "factual_accuracy": 7, "output_moderation": 13},
+                    {"timestamp": "2026-02-04T13:00:00", "input_guardrails": 32, "contextual_relevancy": 22, "bias_fairness": 8, "hallucination": 27, "factual_accuracy": 14, "output_moderation": 24},
+                    {"timestamp": "2026-02-04T14:00:00", "input_guardrails": 38, "contextual_relevancy": 26, "bias_fairness": 10, "hallucination": 32, "factual_accuracy": 17, "output_moderation": 29},
+                    {"timestamp": "2026-02-04T15:00:00", "input_guardrails": 35, "contextual_relevancy": 24, "bias_fairness": 9, "hallucination": 29, "factual_accuracy": 15, "output_moderation": 26},
+                    {"timestamp": "2026-02-04T16:00:00", "input_guardrails": 24, "contextual_relevancy": 15, "bias_fairness": 5, "hallucination": 19, "factual_accuracy": 9, "output_moderation": 17},
+                    {"timestamp": "2026-02-04T17:00:00", "input_guardrails": 13, "contextual_relevancy": 7, "bias_fairness": 2, "hallucination": 10, "factual_accuracy": 5, "output_moderation": 8},
+                ]
+            },
+            "response_latency": {
+                "chart_type": "line",
+                "data": [
+                    {"timestamp": "2026-02-04T08:00:00", "avg": 125, "p95": 245, "p99": 312},
+                    {"timestamp": "2026-02-04T09:00:00", "avg": 132, "p95": 258, "p99": 328},
+                    {"timestamp": "2026-02-04T10:00:00", "avg": 148, "p95": 289, "p99": 367},
+                    {"timestamp": "2026-02-04T11:00:00", "avg": 142, "p95": 276, "p99": 351},
+                    {"timestamp": "2026-02-04T12:00:00", "avg": 118, "p95": 231, "p99": 294},
+                    {"timestamp": "2026-02-04T13:00:00", "avg": 156, "p95": 305, "p99": 388},
+                    {"timestamp": "2026-02-04T14:00:00", "avg": 168, "p95": 328, "p99": 417},
+                    {"timestamp": "2026-02-04T15:00:00", "avg": 159, "p95": 311, "p99": 395},
+                    {"timestamp": "2026-02-04T16:00:00", "avg": 138, "p95": 269, "p99": 342},
+                    {"timestamp": "2026-02-04T17:00:00", "avg": 112, "p95": 219, "p99": 279},
+                ]
+            }
+        },
+        "filters": {
+            "start": start_date,
+            "end": end_date,
+            "granularity": granularity,
+            "chart_type": chart_type,
+            "lob": lob,
+            "topic": topic
+        }
+    }

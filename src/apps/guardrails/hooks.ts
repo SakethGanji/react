@@ -10,6 +10,9 @@ import {
 import { useDashboardStore } from './store'
 import { DashboardFilters } from './types'
 
+// Re-export alerts hook for convenience
+export { useAlerts } from './alerts'
+
 // Helper to convert filters to query key
 function filtersToKey(filters: DashboardFilters) {
   return {
