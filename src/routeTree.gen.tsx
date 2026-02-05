@@ -3,14 +3,15 @@ import { Suspense } from 'react'
 import { RootLayout } from './routes/__root'
 import { AppLayout, appBeforeLoad } from './routes/_app'
 import { PocLayout, pocBeforeLoad } from './routes/_poc'
-import { PublicLayout } from './routes/_public'
 import { Dashboard, Settings } from './apps/guardrails'
 import { PocGallery } from './poc/PocGallery'
 import { POC_REGISTRY, getPocByPath } from './poc'
+import { NotFound } from './shared/components/NotFound'
 
 // Root route
 export const rootRoute = createRootRoute({
   component: RootLayout,
+  notFoundComponent: NotFound,
 })
 
 // =============================================================================
@@ -104,26 +105,6 @@ const pocRoutes = POC_REGISTRY.map((poc) =>
 )
 
 // =============================================================================
-// Public Layout Routes (no auth)
-// =============================================================================
-export const publicLayoutRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  id: '_public',
-  component: PublicLayout,
-})
-
-export const loginRoute = createRoute({
-  getParentRoute: () => publicLayoutRoute,
-  path: '/login',
-  component: () => (
-    <main className="login-page">
-      <h1>Login</h1>
-      <p>SSO login will redirect here when auth is enabled.</p>
-    </main>
-  ),
-})
-
-// =============================================================================
 // Route Tree
 // =============================================================================
 export const routeTree = rootRoute.addChildren([
@@ -136,8 +117,5 @@ export const routeTree = rootRoute.addChildren([
   pocLayoutRoute.addChildren([
     pocGalleryRoute,
     ...pocRoutes,
-  ]),
-  publicLayoutRoute.addChildren([
-    loginRoute,
   ]),
 ])
