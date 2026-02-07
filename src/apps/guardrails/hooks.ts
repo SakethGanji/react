@@ -13,7 +13,7 @@ import { useDashboardStore } from './store'
 import type { DashboardFilters, MessagesTableParams, MessagesTableApiResponse } from './types'
 
 // Re-export alerts hook for convenience
-export { useAlerts } from './alerts'
+export { useAlerts } from '@/shared/store'
 
 // Helper to convert filters to query key
 function filtersToKey(filters: DashboardFilters) {

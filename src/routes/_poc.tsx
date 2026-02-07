@@ -11,9 +11,9 @@ export function PocLayout() {
   return (
     <div className={`poc-layout theme-${theme}`} data-theme={theme}>
       <header className="poc-header">
-        <Link to="/guardrails/dashboard" className="poc-back-link">
+        <Link to="/gallery" className="poc-back-link">
           <ArrowLeft size={18} />
-          <span>Back to App</span>
+          <span>Back to Gallery</span>
         </Link>
         <span className="poc-badge">POC</span>
       </header>
@@ -27,7 +27,7 @@ export async function pocBeforeLoad() {
   if (!IS_DEV) {
     throw new Response(null, {
       status: 302,
-      headers: { Location: '/guardrails/dashboard' },
+      headers: { Location: '/' },
     })
   }
 }

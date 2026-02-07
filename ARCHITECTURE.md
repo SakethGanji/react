@@ -8,88 +8,72 @@ Multiple production UI apps and POC experiments in one repo.
 
 ```
 src/
-├── main.tsx
-├── App.tsx
+├── main.tsx                         # Entry point (QueryClient, global error handler)
+├── App.tsx                          # Router setup
+├── routeTree.gen.tsx                # Route tree (auto-generated from registries)
 │
-├── config/                       # App configuration
-│   ├── index.ts
-│   ├── env.ts
-│   └── api.ts
+├── config/
+│   └── backends.ts                  # Environment-based backend URL config
 │
-├── shared/                       # Shared across all apps and POCs
+├── shared/
 │   ├── components/
-│   ├── charts/
-│   ├── hooks/
-│   ├── utils/
-│   ├── store/
-│   ├── auth/
-│   └── types/
-│
-├── apps/                         # Production apps (each is a separate UI product)
-│   ├── guardrails/               # Guardrails app
-│   │   ├── index.ts              # Public exports
-│   │   ├── pages/
-│   │   │   ├── Dashboard.tsx
-│   │   │   ├── Settings.tsx
-│   │   │   └── Reports.tsx
+│   │   ├── AppSwitcher.tsx          # Dropdown to switch between apps
+│   │   ├── AppNavigation.tsx        # Per-app nav links (reads from APP_REGISTRY)
+│   │   ├── ErrorBoundary.tsx
+│   │   ├── NotFound.tsx
+│   │   └── index.ts
+│   ├── charts/                      # ECharts components (Line, Bar, Area, Pie, StackedBar)
 │   │   ├── components/
-│   │   ├── hooks.ts
-│   │   ├── services.ts
-│   │   └── types.ts
-│   │
-│   └── analytics/                # Analytics app (separate product)
-│       ├── index.ts
+│   │   ├── hooks/
+│   │   ├── themes/
+│   │   ├── types.ts
+│   │   └── index.ts
+│   ├── store/
+│   │   ├── useUIStore.ts            # Theme, sidebar state
+│   │   ├── useAlertStore.ts         # Toast notifications (success/error/warning/info)
+│   │   └── index.ts
+│   └── auth/
+│       ├── AuthGuard.tsx
+│       ├── authService.ts
+│       ├── config.ts
+│       └── index.ts
+│
+├── apps/
+│   ├── index.ts                     # APP_REGISTRY (drives routes, nav, lazy loading)
+│   └── guardrails/
+│       ├── index.ts                 # Public exports (types, hooks)
 │       ├── pages/
-│       │   ├── Overview.tsx
-│       │   ├── Metrics.tsx
-│       │   └── Alerts.tsx
+│       │   ├── Dashboard.tsx
+│       │   └── Settings.tsx
 │       ├── components/
+│       │   ├── MetricCard.tsx
+│       │   ├── EChartsChart.tsx
+│       │   ├── EChartsPieChart.tsx
+│       │   ├── FilterBar.tsx
+│       │   ├── DataTable.tsx
+│       │   ├── AlertContainer.tsx
+│       │   ├── ConversationModal.tsx
+│       │   ├── Skeletons.tsx
+│       │   └── index.ts
 │       ├── hooks.ts
+│       ├── services.ts
+│       ├── store.ts                 # App-specific Zustand store (filters)
+│       ├── errors.ts
 │       └── types.ts
 │
-├── poc/                          # POCs (dev only, excluded from prod builds)
-│   ├── index.ts                  # Registry
-│   │
-│   ├── chart-experiments/        # Simple POC
-│   │   └── index.tsx
-│   │
-│   └── rag-experiment/           # Complex POC (same structure as apps)
-│       ├── index.tsx             # Entry point
-│       ├── pages/
-│       │   ├── Upload.tsx
-│       │   ├── Query.tsx
-│       │   └── Results.tsx
-│       ├── components/
-│       ├── hooks.ts
-│       └── types.ts
+├── poc/
+│   ├── index.ts                     # POC_REGISTRY
+│   ├── PocGallery.tsx               # Gallery at /gallery
+│   └── chart-experiments/
+│       └── index.tsx
 │
-└── routes/                       # TanStack Router
-    ├── __root.tsx
-    ├── _app.tsx                  # Shared prod layout (auth + app switcher)
-    ├── _poc.tsx                  # POC layout (minimal)
-    ├── _public.tsx               # Public layout (no auth)
-    │
-    ├── _app/
-    │   ├── index.tsx             # / (app selector or default redirect)
-    │   │
-    │   ├── guardrails/           # /guardrails/*
-    │   │   ├── index.tsx         # /guardrails
-    │   │   ├── dashboard.tsx     # /guardrails/dashboard
-    │   │   ├── settings.tsx      # /guardrails/settings
-    │   │   └── reports.tsx       # /guardrails/reports
-    │   │
-    │   └── analytics/            # /analytics/*
-    │       ├── index.tsx         # /analytics
-    │       ├── overview.tsx      # /analytics/overview
-    │       ├── metrics.tsx       # /analytics/metrics
-    │       └── alerts.tsx        # /analytics/alerts
-    │
-    └── _poc/
-        ├── index.tsx             # /poc (gallery)
-        └── $pocId/
-            ├── index.tsx         # /poc/:pocId
-            └── $.tsx             # /poc/:pocId/* (catch-all for sub-routes)
+└── routes/
+    ├── __root.tsx                   # Root layout (ErrorBoundary)
+    ├── _app.tsx                     # App layout (header, nav, auth)
+    └── _poc.tsx                     # POC layout (dev only, minimal header)
 ```
+
+Routes are **not** file-based. They are dynamically generated from `APP_REGISTRY` and `POC_REGISTRY` in `routeTree.gen.tsx`.
 
 ---
 
@@ -98,13 +82,105 @@ src/
 ```
 config/     ← Anyone can import
 shared/     ← apps/ and poc/ can import
-apps/       ← Only routes/ can import (no cross-app imports)
-poc/        ← Only routes/poc/ can import (no app imports)
+apps/       ← Only routeTree.gen.tsx can import (no cross-app imports)
+poc/        ← Only routeTree.gen.tsx can import (no app imports)
 ```
 
-Apps and POCs are isolated from each other. Both can use shared code.
+Apps and POCs are isolated from each other. Both can use shared code. The route tree file is the only place that wires registries to layouts.
 
-All apps and POCs can mix styling frameworks (tailwind + shadcn + internal) as needed.
+---
+
+## Styling Strategy: Wrap and Fill
+
+If your company has a design system / component library, **do not use Shadcn UI alongside it**. Having `CompanyButton` (blue, rounded) and `ShadcnButton` (black, slightly rounded) in the same app looks unprofessional and confuses developers.
+
+Instead, `shared/components` becomes an **abstraction layer**:
+
+- **Primary Source:** Use the Company Library for everything it offers (Buttons, Inputs, Typography).
+- **Gap Filling:** If the Company Library is missing a complex component (e.g., Combobox, Sheet), build it using a Headless UI library (Radix UI or React Aria) and style it to match the Company Library.
+
+### Shared Components Structure
+
+```
+src/shared/components/
+├── core/                   # 1. WRAPPERS around Company Library
+│   ├── Button.tsx          # Re-exports or wraps CompanyButton
+│   ├── Input.tsx
+│   ├── Typography.tsx
+│   └── ...
+│
+├── extended/               # 2. GAP FILLERS (custom built to match)
+│   ├── DatePicker.tsx      # Company didn't have one, so we built it
+│   ├── MultiSelect.tsx     # Built using Headless UI + Company styles
+│   └── DataTable.tsx       # TanStack Table + Company styles
+│
+├── patterns/               # 3. APP PATTERNS (composition)
+│   ├── FilterBar.tsx       # Input + DatePicker + Button
+│   ├── UserMenu.tsx        # Avatar + Dropdown
+│   └── PageLayout.tsx
+│
+└── index.ts                # Single entry point
+```
+
+### Scenario A: Complete Company Library
+
+It has Buttons, Modals, Dropdowns, Grids, etc.
+
+**Action:** Do not install Shadcn. Use the company library. Create wrappers in `shared/components/core` so your apps don't depend directly on the npm package name.
+
+```typescript
+// src/shared/components/core/Button.tsx
+import { CompanyButton } from '@acme/design-system'
+
+// Wrap it so if the company lib changes later, we only fix it here.
+export const Button = CompanyButton
+```
+
+### Scenario B: Basic Company Library (Most Common)
+
+It has Buttons and Inputs, but lacks complex interactive components like Dialogs, Popovers, or Data Tables.
+
+**Action:** Use Radix UI (the headless logic behind Shadcn) directly. Do not use Shadcn (which comes pre-styled with Tailwind).
+
+```typescript
+// src/shared/components/extended/Modal.tsx
+import * as DialogPrimitive from '@radix-ui/react-dialog'
+import { Button } from '../core/Button' // Your wrapped company button
+
+export function Modal({ isOpen, onClose, title, children }) {
+  return (
+    <DialogPrimitive.Root open={isOpen} onOpenChange={onClose}>
+      <DialogPrimitive.Overlay className="company-overlay-class" />
+      <DialogPrimitive.Content className="company-card-class">
+        <DialogPrimitive.Title className="company-h2-class">
+          {title}
+        </DialogPrimitive.Title>
+        <div className="company-body-text">
+          {children}
+        </div>
+        <div className="company-footer-class">
+          <Button onClick={onClose}>Close</Button>
+        </div>
+      </DialogPrimitive.Content>
+    </DialogPrimitive.Root>
+  )
+}
+```
+
+### Styling Rules for Apps vs POCs
+
+- **Production Apps:** MUST import from `@/shared/components`. This ensures they stay on-brand.
+- **POCs:**
+  - **Ideally:** Use `@/shared/components` to validate the design system works for the new feature.
+  - **Allowed:** If a POC needs a specialized component the company lib doesn't have, it can install a POC-specific package.
+  - **Rule:** If that POC gets promoted to Production, you must rebuild the component in `shared/components/extended` to match company styles.
+
+### Styling Checklist
+
+- Keep the `shared/components` folder. It is vital for isolation.
+- Do not use Shadcn (pre-styled components) alongside a company library.
+- Do use Radix UI / React Aria (headless libraries) to build complex components the company library is missing.
+- Wrap everything. Even if you just re-export the company button, do it in `shared/components`. It protects your code from breaking changes in company library updates.
 
 ---
 
@@ -114,118 +190,53 @@ Each app is a **separate UI product** that lives under its own URL prefix. Apps 
 
 ### App Registry
 
+The registry is the single source of truth for apps. It drives:
+- Route creation (automatic, no manual route files needed)
+- App switcher navigation
+- Per-app nav bar links
+- Lazy loading (each page is a separate chunk)
+
 ```typescript
 // src/apps/index.ts
+export interface AppRoute {
+  path: string           // Subpath relative to basePath, e.g. 'dashboard'
+  label: string          // Navigation label
+  component: ComponentType // Lazy-loaded page component
+}
+
 export interface AppEntry {
   id: string
   name: string
   description: string
-  basePath: string
-  icon?: string
-  defaultRoute?: string
+  basePath: string       // URL prefix, e.g. '/guardrails'
+  defaultRoute: string   // Redirect target, e.g. '/guardrails/dashboard'
+  routes: AppRoute[]     // All pages for this app
 }
 
 export const APP_REGISTRY: AppEntry[] = [
   {
     id: 'guardrails',
     name: 'Guardrails',
-    description: 'Policy management and compliance',
+    description: 'Guardrail monitoring and configuration dashboard',
     basePath: '/guardrails',
     defaultRoute: '/guardrails/dashboard',
-  },
-  {
-    id: 'analytics',
-    name: 'Analytics',
-    description: 'Metrics and reporting',
-    basePath: '/analytics',
-    defaultRoute: '/analytics/overview',
+    routes: [
+      {
+        path: 'dashboard',
+        label: 'Dashboard',
+        component: lazy(() => import('./guardrails/pages/Dashboard').then(m => ({ default: m.Dashboard }))),
+      },
+      {
+        path: 'settings',
+        label: 'Settings',
+        component: lazy(() => import('./guardrails/pages/Settings').then(m => ({ default: m.Settings }))),
+      },
+    ],
   },
 ]
 ```
 
-### App Switcher
-
-The shared layout includes an app switcher for navigation between apps:
-
-```typescript
-// src/shared/components/AppSwitcher.tsx
-import { APP_REGISTRY } from '@/apps'
-import { Link } from '@tanstack/react-router'
-
-export function AppSwitcher({ currentAppId }: { currentAppId?: string }) {
-  return (
-    <nav className="app-switcher">
-      {APP_REGISTRY.map((app) => (
-        <Link
-          key={app.id}
-          to={app.defaultRoute}
-          className={currentAppId === app.id ? 'active' : ''}
-        >
-          {app.name}
-        </Link>
-      ))}
-    </nav>
-  )
-}
-```
-
-### App-Specific Navigation
-
-Each app has its own internal navigation:
-
-```typescript
-// src/apps/guardrails/navigation.ts
-export const GUARDRAILS_NAV = [
-  { path: '/guardrails/dashboard', label: 'Dashboard' },
-  { path: '/guardrails/settings', label: 'Settings' },
-  { path: '/guardrails/reports', label: 'Reports' },
-]
-
-// src/apps/analytics/navigation.ts
-export const ANALYTICS_NAV = [
-  { path: '/analytics/overview', label: 'Overview' },
-  { path: '/analytics/metrics', label: 'Metrics' },
-  { path: '/analytics/alerts', label: 'Alerts' },
-]
-```
-
-### Shared Layout with App Context
-
-```typescript
-// src/routes/_app.tsx
-import { createFileRoute, Outlet, useMatches } from '@tanstack/react-router'
-import { AppSwitcher } from '@/shared/components/AppSwitcher'
-import { AppNavigation } from '@/shared/components/AppNavigation'
-
-export const Route = createFileRoute('/_app')({
-  beforeLoad: async () => {
-    if (!isAuthenticated()) {
-      throw redirect({ to: '/login' })
-    }
-  },
-  component: AppLayout,
-})
-
-function AppLayout() {
-  const matches = useMatches()
-  // Extract current app from route: /guardrails/... → 'guardrails'
-  const currentAppId = matches[1]?.pathname.split('/')[1]
-
-  return (
-    <div className="app-layout">
-      <header>
-        <AppSwitcher currentAppId={currentAppId} />
-      </header>
-      <aside>
-        <AppNavigation appId={currentAppId} />
-      </aside>
-      <main>
-        <Outlet />
-      </main>
-    </div>
-  )
-}
-```
+Routes are auto-generated from this registry in `routeTree.gen.tsx`. No manual route files needed — adding an entry here creates the route, the nav link, and the lazy-loaded chunk automatically.
 
 ### Adding a New App
 
@@ -233,8 +244,7 @@ function AppLayout() {
 
 ```
 src/apps/my-app/
-├── index.ts              # Public exports
-├── navigation.ts         # App-specific nav items
+├── index.ts              # Public exports (types, hooks)
 ├── pages/
 │   ├── Home.tsx
 │   ├── Settings.tsx
@@ -244,7 +254,7 @@ src/apps/my-app/
 └── types.ts
 ```
 
-2. **Register the app**
+2. **Register the app** — this is the only step that creates routes and navigation
 
 ```typescript
 // src/apps/index.ts
@@ -256,41 +266,28 @@ export const APP_REGISTRY: AppEntry[] = [
     description: 'What this app does',
     basePath: '/my-app',
     defaultRoute: '/my-app/home',
+    routes: [
+      {
+        path: 'home',
+        label: 'Home',
+        component: lazy(() => import('./my-app/pages/Home').then(m => ({ default: m.Home }))),
+      },
+      {
+        path: 'settings',
+        label: 'Settings',
+        component: lazy(() => import('./my-app/pages/Settings').then(m => ({ default: m.Settings }))),
+      },
+    ],
   },
 ]
 ```
 
-3. **Create routes**
-
-```
-src/routes/_app/my-app/
-├── index.tsx             # /my-app (redirect to default)
-├── home.tsx              # /my-app/home
-├── settings.tsx          # /my-app/settings
-└── details.$id.tsx       # /my-app/details/:id
-```
-
-```typescript
-// src/routes/_app/my-app/home.tsx
-import { createFileRoute } from '@tanstack/react-router'
-import { HomePage } from '@/apps/my-app'
-
-export const Route = createFileRoute('/_app/my-app/home')({
-  component: HomePage,
-})
-```
-
-4. **Add navigation**
-
-```typescript
-// src/apps/my-app/navigation.ts
-export const MY_APP_NAV = [
-  { path: '/my-app/home', label: 'Home' },
-  { path: '/my-app/settings', label: 'Settings' },
-]
-```
-
-The app will automatically appear in the app switcher.
+That's it. The app automatically gets:
+- Routes at `/my-app/home`, `/my-app/settings`
+- A redirect from `/my-app` to `/my-app/home`
+- An entry in the app switcher
+- Nav links in the app nav bar
+- Lazy-loaded page chunks
 
 ---
 
@@ -316,33 +313,34 @@ No auto-wrappers or magic. You control everything inside your POC.
 
 ```typescript
 // src/poc/index.ts
+import { ComponentType, lazy } from 'react'
+
 export interface POCEntry {
   id: string
   name: string
-  description?: string
-  tags?: string[]
-  component: () => Promise<{ default: ComponentType }>
+  description: string
+  path: string           // Top-level route path, e.g. '/chart-experiments'
+  tags: string[]
+  component: ComponentType // React.lazy component
 }
 
-export const POC_REGISTRY: POCEntry[] = [
-  {
-    id: 'chart-experiments',
-    name: 'Chart Experiments',
-    description: 'Testing ECharts configs',
-    tags: ['charts'],
-    component: () => import('./chart-experiments'),
-  },
-  {
-    id: 'rag-experiment',
-    name: 'RAG Experiment',
-    description: 'Document upload and querying',
-    tags: ['rag', 'llm'],
-    component: () => import('./rag-experiment'),
-  },
-]
+// Entries are wrapped in import.meta.env.DEV so that the lazy import()
+// calls become dead code in production — Vite tree-shakes them entirely.
+export const POC_REGISTRY: POCEntry[] = import.meta.env.DEV
+  ? [
+      {
+        id: 'chart-experiments',
+        name: 'Chart Experiments',
+        description: 'Experimental chart components and visualizations',
+        path: '/chart-experiments',
+        tags: ['charts', 'visualization', 'echarts'],
+        component: lazy(() => import('./chart-experiments')),
+      },
+    ]
+  : []
 ```
 
-The registry is just metadata for the gallery. Each POC handles its own styling, layout, routing, and backend internally.
+The registry is just metadata for the gallery. Each POC handles its own styling, layout, routing, and backend internally. POC code is excluded from production builds because the entire POC route tree is wrapped in `if (import.meta.env.DEV)` in `routeTree.gen.tsx` — Vite tree-shakes it away in production.
 
 ### POC Structure
 
@@ -373,140 +371,132 @@ export default function MyPoc() {
 
 ### POC Sub-routes
 
-POCs can have multiple pages with their own routing:
+POCs can have multiple pages using state-based navigation or the TanStack Router catch-all:
 
 ```
 src/poc/rag-experiment/
-├── index.tsx                   # Entry point with internal router
+├── index.tsx                   # Entry point with internal navigation
 ├── pages/
-│   ├── Upload.tsx              # /poc/rag-experiment/upload
-│   ├── Query.tsx               # /poc/rag-experiment/query
-│   └── Results.tsx             # /poc/rag-experiment/results/:id
+│   ├── Upload.tsx
+│   ├── Query.tsx
+│   └── Results.tsx
 └── components/
 ```
 
+**Option A: State-based navigation (simple, no extra router)**
+
 ```typescript
 // src/poc/rag-experiment/index.tsx
-import { Routes, Route } from 'react-router-dom'
+import { useState } from 'react'
 import { Upload } from './pages/Upload'
 import { Query } from './pages/Query'
 import { Results } from './pages/Results'
 
+type Page = 'upload' | 'query' | 'results'
+
 export default function RagExperiment() {
+  const [page, setPage] = useState<Page>('upload')
+
   return (
-    <Routes>
-      <Route index element={<Upload />} />
-      <Route path="upload" element={<Upload />} />
-      <Route path="query" element={<Query />} />
-      <Route path="results/:id" element={<Results />} />
-    </Routes>
+    <div>
+      <nav>
+        <button onClick={() => setPage('upload')}>Upload</button>
+        <button onClick={() => setPage('query')}>Query</button>
+        <button onClick={() => setPage('results')}>Results</button>
+      </nav>
+      {page === 'upload' && <Upload onNext={() => setPage('query')} />}
+      {page === 'query' && <Query />}
+      {page === 'results' && <Results />}
+    </div>
   )
 }
 ```
 
-The catch-all route `src/routes/_poc/$pocId/$.tsx` passes sub-paths to the POC's internal router.
+**Option B: TanStack Router catch-all**
+
+The catch-all route `src/routes/_poc/$pocId/$.tsx` passes the remaining path to the POC. The POC can read it via `useParams` and render accordingly. Do **not** nest a second router (e.g., `react-router-dom`) inside TanStack Router — mixing routers causes conflicts.
 
 
 ### Adding a POC
 
 1. Create `src/poc/my-poc/index.tsx` with a default export
-2. Add entry to `POC_REGISTRY`
-3. Navigate to `/poc/my-poc`
+2. Add entry to `POC_REGISTRY` with a `path` (e.g., `/my-poc`)
+3. Navigate to `/my-poc`
 
 ### Promoting POC to Production App
 
 When a POC is ready to become a production app:
 
-**1. Move the code**
+**1. Move the folder**
 
 ```bash
 mv src/poc/my-poc src/apps/my-app
 ```
 
-**2. Update imports (if any relative paths)**
+**2. Switch registries**
+
+Remove entry from `POC_REGISTRY` and add to `APP_REGISTRY`:
 
 ```typescript
-// Fix any relative imports to use aliases
-import { something } from '@/shared/components'
-```
-
-**3. Add navigation config**
-
-```typescript
-// src/apps/my-app/navigation.ts
-export const MY_APP_NAV = [
-  { path: '/my-app', label: 'Home' },
-  { path: '/my-app/settings', label: 'Settings' },
-]
-```
-
-**4. Create production routes**
-
-```
-src/routes/_app/my-app/
-├── index.tsx           # /my-app
-├── settings.tsx        # /my-app/settings
-└── details.$id.tsx     # /my-app/details/:id
+// src/apps/index.ts — add entry with lazy-loaded routes
+{
+  id: 'my-app',
+  name: 'My App',
+  description: 'What this app does',
+  basePath: '/my-app',
+  defaultRoute: '/my-app/home',
+  routes: [
+    {
+      path: 'home',
+      label: 'Home',
+      component: lazy(() => import('./my-app/pages/Home').then(m => ({ default: m.Home }))),
+    },
+  ],
+}
 ```
 
 ```typescript
-// src/routes/_app/my-app/index.tsx
-import { createFileRoute } from '@tanstack/react-router'
-import { HomePage } from '@/apps/my-app'
-
-export const Route = createFileRoute('/_app/my-app/')({
-  component: HomePage,
-})
+// src/poc/index.ts — delete the old entry
 ```
 
-**5. Register the app**
+Routes, navigation, and lazy loading are handled automatically by the registry.
 
-```typescript
-// src/apps/index.ts
-export const APP_REGISTRY: AppEntry[] = [
-  // ... existing apps
-  {
-    id: 'my-app',
-    name: 'My App',
-    description: 'Description here',
-    basePath: '/my-app',
-    defaultRoute: '/my-app',
-  },
-]
-```
+**3. Code Review Checklist**
 
-**6. Remove from POC registry**
+Promoting code from "hacky experiment" to "production standard" must involve a manual review. Before merging the promotion PR, verify:
 
-```typescript
-// src/poc/index.ts - delete the entry
-```
+- [ ] No hardcoded secrets or API keys
+- [ ] Accessibility (ARIA) attributes added (POCs usually skip these)
+- [ ] Strict TypeScript types defined (no `any`)
+- [ ] API errors handled with user-facing feedback
+- [ ] All imports use `@/shared/components` (not POC-specific packages that weren't rebuilt)
+- [ ] Styling uses `shared/components/core` or `shared/components/extended` (on-brand)
+- [ ] App-specific state lives in `apps/my-app/store.ts`, not in `shared/store`
 
-Now accessible at `/my-app` instead of `/poc/my-poc`, and appears in the app switcher.
+Now accessible at `/my-app` instead of `/chart-experiments`, and appears in the app switcher.
 
 ---
 
 ## Routing & Auth
 
-Three layout groups with different auth requirements:
+Layout groups with different auth requirements:
 
 | Layout | Routes | Auth | Navbar |
 |--------|--------|------|--------|
-| `_app` | `/`, `/settings` | Required | Yes |
-| `_poc` | `/poc/*` | None | No |
-| `_public` | `/login` | None | No |
+| `_app` | `/`, `/guardrails/*`, `/analytics/*` | Required | Yes |
+| `_poc` | `/gallery`, `/chart-experiments`, etc. | None | No |
 
-Auth is enforced at the layout level:
+> Add a `_public` layout (e.g., for `/login`) when unauthenticated routes are needed.
+
+Auth is enforced at the layout level via `beforeLoad` in `routeTree.gen.tsx`:
 
 ```typescript
 // src/routes/_app.tsx
-export const Route = createFileRoute('/_app')({
-  beforeLoad: async () => {
-    if (!isAuthenticated()) {
-      throw redirect({ to: '/login' })
-    }
-  },
-  component: AppLayout,
-})
+export async function appBeforeLoad() {
+  if (ENABLE_AUTH && !isAuthenticated()) {
+    redirectToLogin()
+  }
+}
 ```
 
 POCs that need auth can use the shared auth components:
@@ -526,39 +516,63 @@ export default function SensitivePoc() {
 
 ---
 
-## App Structure Details
+## State Management Rules
 
-Apps have the same flexibility as POCs — any styling, backend, layout, routing, state management. The difference is apps are in production and use the `_app` layout with auth.
+State is split into three categories with strict ownership boundaries:
 
-### App with Multiple Routes
+### Global State (`shared/store/`)
 
-```
-src/apps/guardrails/
-├── index.ts                    # Exports pages
-├── navigation.ts               # App nav items
-├── pages/
-│   ├── Dashboard.tsx           # /guardrails/dashboard
-│   ├── Settings.tsx            # /guardrails/settings
-│   └── Reports.tsx             # /guardrails/reports
-├── components/
-└── hooks.ts
+Only for concerns that span the entire application:
 
-src/routes/_app/guardrails/
-├── index.tsx                   # /guardrails (redirect or landing)
-├── dashboard.tsx               # /guardrails/dashboard
-├── settings.tsx                # /guardrails/settings
-└── reports.tsx                 # /guardrails/reports
-```
+- UI state: sidebar, theme
+- User session: auth status, user profile
+- Notifications: toast alerts, banners
 
 ```typescript
-// src/routes/_app/guardrails/dashboard.tsx
-import { createFileRoute } from '@tanstack/react-router'
-import { Dashboard } from '@/apps/guardrails'
-
-export const Route = createFileRoute('/_app/guardrails/dashboard')({
-  component: Dashboard,
-})
+// src/shared/store/useUIStore.ts — global, any app can read/write
+export const useUIStore = create<UIState>((set) => ({
+  sidebarOpen: true,
+  theme: 'light',
+  toggleSidebar: () => set((s) => ({ sidebarOpen: !s.sidebarOpen })),
+  setTheme: (theme) => set({ theme }),
+}))
 ```
+
+### App-Specific State (`apps/*/store.ts`)
+
+For state that belongs to a single app. If App A sets `isLoading = true`, it must **not** trigger a loader in App B.
+
+```typescript
+// src/apps/guardrails/store.ts — only guardrails reads/writes this
+export const useDashboardStore = create<DashboardStore>((set) => ({
+  appliedFilters: DEFAULT_FILTERS,
+  draftFilters: DEFAULT_FILTERS,
+  // ...
+}))
+```
+
+### Server State (TanStack Query)
+
+For data fetched from APIs. Do not duplicate server data into Zustand stores.
+
+```typescript
+// src/apps/guardrails/hooks.ts
+export function useDashboardData(filters: DashboardFilters) {
+  return useQuery({
+    queryKey: ['dashboard', filters],
+    queryFn: () => fetchDashboardData(filters),
+  })
+}
+```
+
+### Decision Guide
+
+| Question | Answer |
+|----------|--------|
+| Is it user session, theme, or toasts? | `shared/store/` |
+| Is it fetched from an API? | TanStack Query |
+| Is it UI state for one app (filters, drafts, selections)? | `apps/*/store.ts` |
+| Is it local to one component? | `useState` / `useReducer` |
 
 ---
 
@@ -580,8 +594,8 @@ npm run preview
 
 Dev server runs at `http://localhost:5173` (Vite default).
 
-- POC gallery: `http://localhost:5173/poc`
-- Specific POC: `http://localhost:5173/poc/my-poc`
+- POC gallery: `http://localhost:5173/gallery`
+- Specific POC: `http://localhost:5173/chart-experiments`
 - Production features: `http://localhost:5173/guardrails/dashboard`
 
 ---
@@ -715,47 +729,92 @@ const API_URL = import.meta.env.DEV
 
 ## Build Configuration
 
-### Code Exclusion from Production
+### Lazy Loading (Code Splitting)
 
-POC code is excluded from production builds:
+Every app page and POC is lazy-loaded. Vite splits each into its own chunk, loaded only when the user navigates to that route.
 
-**1. Route-level redirect**
+**App pages** use `React.lazy` in the `APP_REGISTRY`:
 
 ```typescript
-// src/routes/_poc.tsx
-import { createFileRoute, Navigate, Outlet } from '@tanstack/react-router'
-import { ENV } from '@/config'
-
-export const Route = createFileRoute('/_poc')({
-  component: () => {
-    if (ENV.isProd) {
-      return <Navigate to="/" />
-    }
-    return <Outlet />
+// src/apps/index.ts — lazy-loaded in the registry, auto-wrapped in Suspense by routeTree
+routes: [
+  {
+    path: 'dashboard',
+    label: 'Dashboard',
+    component: lazy(() => import('./guardrails/pages/Dashboard').then(m => ({ default: m.Dashboard }))),
   },
-})
+]
 ```
 
-**2. Vite config (guaranteed exclusion)**
+**POCs** use `React.lazy` in the `POC_REGISTRY`:
 
 ```typescript
-// vite.config.ts
-export default defineConfig(({ mode }) => ({
-  build: {
-    rollupOptions: {
-      external: mode === 'production'
-        ? (id) => id.includes('/src/poc/')
-        : [],
-    },
-  },
-}))
+// src/poc/index.ts
+component: lazy(() => import('./chart-experiments'))
+```
+
+`routeTree.gen.tsx` dynamically generates routes from both registries and wraps each component in `<Suspense>`.
+
+**What this means for the bundle:**
+
+| Chunk | Size | Loaded when |
+|-------|------|-------------|
+| `index.js` | ~266 kB | Always (shell, router, shared) |
+| `Dashboard-*.js` | ~567 kB | User visits `/guardrails/dashboard` (includes ECharts) |
+| `Settings-*.js` | ~2 kB | User visits `/guardrails/settings` |
+| POC chunks | Varies | User visits POC route (dev only) |
+
+**Rule:** Always use `lazy()` in the registry. Never statically import page components.
+
+---
+
+### Code Exclusion from Production
+
+POC code is excluded from production builds through two layers:
+
+**1. Dead code elimination (primary mechanism)**
+
+Both `POC_REGISTRY` (in `src/poc/index.ts`) and the POC route creation (in `routeTree.gen.tsx`) are wrapped in `import.meta.env.DEV` conditionals. Vite replaces `import.meta.env.DEV` with `false` at build time, making POC registry entries and all route creation dead code. The tree-shaker then drops the `lazy(() => import(...))` calls and their transitive dependencies from the bundle — zero POC code ships to production.
+
+```typescript
+// src/routeTree.gen.tsx
+import { PocLayout, pocBeforeLoad } from './routes/_poc'
+import { PocGallery } from './poc/PocGallery'
+import { POC_REGISTRY, getPocByPath } from './poc'
+
+// These imports are ONLY used inside this block.
+// In production, the block is dead code and everything is tree-shaken away.
+if (import.meta.env.DEV) {
+  // ... POC route creation
+}
+```
+
+**2. Route-level redirect (safety net)**
+
+`_poc.tsx` also checks `import.meta.env.DEV` and redirects to `/` in production, in case any POC route is somehow reached.
+
+**3. Verify with bundle analysis**
+
+After building, confirm no POC code is in the bundle:
+
+```bash
+# Install the visualizer
+npm install -D rollup-plugin-visualizer
+
+# Add to vite.config.ts plugins array:
+# import { visualizer } from 'rollup-plugin-visualizer'
+# plugins: [react(), visualizer({ open: true })]
+
+# Build and inspect
+npm run build
+# Opens a treemap — search for "poc" to confirm it's absent
 ```
 
 ### What Gets Excluded
 
 | Code | Dev | Prod |
 |------|-----|------|
-| `src/poc/*` | Loaded | Excluded |
+| `src/poc/*` | Loaded | Excluded (empty registry + tree-shaking) |
 | `src/apps/*` | Loaded | Loaded |
 | `src/shared/*` | Loaded | Only used parts |
 
@@ -769,14 +828,13 @@ Available for all apps and POCs to import:
 
 | Module | What's there |
 |--------|--------------|
-| `@/shared/components` | Button, Modal, NavigationBar, etc. |
-| `@/shared/charts` | LineChart, BarChart, PieChart (ECharts) |
-| `@/shared/hooks` | useDebounce, useLocalStorage, etc. |
-| `@/shared/store` | useUIStore (Zustand) |
-| `@/shared/auth` | AuthGuard, isAuthenticated |
-| `@/shared/utils` | formatDate, validation helpers |
-| `@/shared/types` | Common TypeScript types |
-| `@/config` | API_URL, env vars, constants |
+| `@/shared/components` | AppSwitcher, AppNavigation, ErrorBoundary, NotFound |
+| `@/shared/charts` | LineChart, BarChart, AreaChart, PieChart, StackedBarChart (ECharts) |
+| `@/shared/store` | useUIStore (theme, sidebar), useAlertStore (toast notifications) |
+| `@/shared/auth` | AuthGuard, isAuthenticated, authService |
+| `@/config` | Backend URL config |
+
+As the project grows, add `shared/hooks/`, `shared/utils/`, `shared/types/` as needed. For company design system integration, add `shared/components/core/`, `extended/`, and `patterns/` per the [Styling Strategy](#styling-strategy-wrap-and-fill).
 
 Use what you need, or don't — apps and POCs can bring their own everything.
 

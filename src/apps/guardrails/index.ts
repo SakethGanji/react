@@ -1,7 +1,6 @@
 // Public exports for the Guardrails app
-export { Dashboard, Settings } from './pages'
-export { GUARDRAILS_NAV } from './navigation'
-export type { NavItem } from './navigation'
+// Page components are lazy-loaded via APP_REGISTRY in src/apps/index.ts
+// Navigation is driven by the routes array in the registry entry
 
 // Re-export types that may be needed externally
 export type {

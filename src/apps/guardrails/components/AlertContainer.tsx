@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useAlertStore, type Alert } from '../alerts'
+import { useAlertStore, type Alert } from '@/shared/store'
 import { X, CheckCircle, AlertCircle, AlertTriangle, Info } from 'lucide-react'
 
 const icons = {

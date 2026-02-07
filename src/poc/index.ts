@@ -9,16 +9,18 @@ export interface POCEntry {
   component: ComponentType
 }
 
-export const POC_REGISTRY: POCEntry[] = [
-  {
-    id: 'chart-experiments',
-    name: 'Chart Experiments',
-    description: 'Experimental chart components and visualizations',
-    path: '/chart-experiments',
-    tags: ['charts', 'visualization', 'echarts'],
-    component: lazy(() => import('./chart-experiments')),
-  },
-]
+export const POC_REGISTRY: POCEntry[] = import.meta.env.DEV
+  ? [
+      {
+        id: 'chart-experiments',
+        name: 'Chart Experiments',
+        description: 'Experimental chart components and visualizations',
+        path: '/chart-experiments',
+        tags: ['charts', 'visualization', 'echarts'],
+        component: lazy(() => import('./chart-experiments')),
+      },
+    ]
+  : []
 
 export function getPocByPath(path: string): POCEntry | undefined {
   return POC_REGISTRY.find((poc) => poc.path === path)

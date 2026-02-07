@@ -2,7 +2,7 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import App from './App'
-import { useAlertStore } from './apps/guardrails/alerts'
+import { useAlertStore } from '@/shared/store'
 import { getErrorMessage } from './apps/guardrails/errors'
 
 const queryClient = new QueryClient({
