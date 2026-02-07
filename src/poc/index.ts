@@ -19,6 +19,22 @@ export const POC_REGISTRY: POCEntry[] = import.meta.env.DEV
         tags: ['charts', 'visualization', 'echarts'],
         component: lazy(() => import('./chart-experiments')),
       },
+      {
+        id: 'hello-world',
+        name: 'Hello World',
+        description: 'Minimal starter template for new POCs',
+        path: '/hello-world',
+        tags: ['template', 'starter'],
+        component: lazy(() => import('./hello-world')),
+      },
+      {
+        id: 'api-test',
+        name: 'API Test',
+        description: 'Test API calls against any endpoint',
+        path: '/api-test',
+        tags: ['api', 'fetch'],
+        component: lazy(() => import('./api-test')),
+      },
     ]
   : []
 

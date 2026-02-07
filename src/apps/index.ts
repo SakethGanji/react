@@ -38,6 +38,44 @@ export const APP_REGISTRY: AppEntry[] = [
       },
     ],
   },
+  {
+    id: 'analytics',
+    name: 'Analytics',
+    description: 'Analytics dashboards and reports',
+    basePath: '/analytics',
+    defaultRoute: '/analytics/overview',
+    routes: [
+      {
+        path: 'overview',
+        label: 'Overview',
+        component: lazy(() => import('./analytics/pages/Overview').then(m => ({ default: m.Overview }))),
+      },
+      {
+        path: 'reports',
+        label: 'Reports',
+        component: lazy(() => import('./analytics/pages/Reports').then(m => ({ default: m.Reports }))),
+      },
+    ],
+  },
+  {
+    id: 'users',
+    name: 'Users',
+    description: 'User management and settings',
+    basePath: '/users',
+    defaultRoute: '/users/list',
+    routes: [
+      {
+        path: 'list',
+        label: 'Users',
+        component: lazy(() => import('./users/pages/List').then(m => ({ default: m.List }))),
+      },
+      {
+        path: 'settings',
+        label: 'Settings',
+        component: lazy(() => import('./users/pages/Settings').then(m => ({ default: m.Settings }))),
+      },
+    ],
+  },
 ]
 
 export function getAppByPath(path: string): AppEntry | undefined {
