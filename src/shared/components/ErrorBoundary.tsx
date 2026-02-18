@@ -27,11 +27,11 @@ export class ErrorBoundary extends Component<Props, State> {
       }
 
       return (
-        <main className="error-boundary">
-          <h1>Something went wrong</h1>
-          <p>An unexpected error occurred.</p>
+        <main className="flex min-h-svh flex-col items-center justify-center gap-4 bg-background p-6 text-center">
+          <h1 className="text-2xl font-semibold text-foreground">Something went wrong</h1>
+          <p className="text-muted-foreground">An unexpected error occurred.</p>
           <button
-            className="error-boundary-button"
+            className="rounded-md bg-primary px-6 py-3 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90"
             onClick={() => window.location.reload()}
           >
             Reload page

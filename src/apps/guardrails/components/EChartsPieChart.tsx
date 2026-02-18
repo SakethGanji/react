@@ -30,16 +30,16 @@ export function EChartsPieChart({ label, value }: Distribution) {
   ]
 
   return (
-    <div className="pie-chart">
-      <div className="pie-chart-svg-container">
+    <div className="flex flex-col items-center gap-1.5">
+      <div className="relative flex items-center justify-center">
         <PieChart
           data={data}
           innerRadius="72%"
           height={72}
         />
-        <span className="pie-chart-value" style={{ pointerEvents: 'none' }}>{value}%</span>
+        <span className="absolute text-xs font-semibold pointer-events-none">{value}%</span>
       </div>
-      <span className="pie-chart-label">{label}</span>
+      <span className="text-xs text-muted-foreground text-center">{label}</span>
     </div>
   )
 }

@@ -24,35 +24,37 @@ export function AppSwitcher({ currentPath }: AppSwitcherProps) {
 
   if (APP_REGISTRY.length <= 1) {
     return (
-      <span className="app-switcher-single">
+      <span className="text-lg font-semibold text-foreground">
         {currentApp?.name ?? 'Dashboard'}
       </span>
     )
   }
 
   return (
-    <div className="app-switcher" ref={dropdownRef}>
+    <div className="relative" ref={dropdownRef}>
       <button
-        className="app-switcher-trigger"
+        className="flex items-center gap-2 rounded-md border border-transparent px-3 py-2 text-lg font-semibold text-foreground transition-colors hover:border-border hover:bg-muted"
         onClick={() => setIsOpen(!isOpen)}
         aria-expanded={isOpen}
         aria-haspopup="listbox"
       >
         <span>{currentApp?.name ?? 'Select App'}</span>
-        <ChevronDown size={16} className={`app-switcher-icon ${isOpen ? 'open' : ''}`} />
+        <ChevronDown size={16} className={`transition-transform ${isOpen ? 'rotate-180' : ''}`} />
       </button>
 
       {isOpen && (
-        <ul className="app-switcher-dropdown" role="listbox">
+        <ul className="absolute left-0 top-[calc(100%+4px)] z-50 min-w-[280px] rounded-md border bg-popover shadow-lg" role="listbox">
           {APP_REGISTRY.map((app) => (
             <li key={app.id} role="option" aria-selected={app.id === currentApp?.id}>
               <Link
                 to={app.defaultRoute}
-                className={`app-switcher-option ${app.id === currentApp?.id ? 'active' : ''}`}
+                className={`flex flex-col gap-1 px-4 py-3 transition-colors hover:bg-muted ${
+                  app.id === currentApp?.id ? 'border-l-[3px] border-l-primary bg-muted' : ''
+                }`}
                 onClick={() => setIsOpen(false)}
               >
-                <span className="app-switcher-option-name">{app.name}</span>
-                <span className="app-switcher-option-desc">{app.description}</span>
+                <span className="text-sm font-semibold text-foreground">{app.name}</span>
+                <span className="text-xs text-muted-foreground">{app.description}</span>
               </Link>
             </li>
           ))}

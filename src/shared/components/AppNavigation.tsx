@@ -13,15 +13,15 @@ export function AppNavigation({ currentPath }: AppNavigationProps) {
   }
 
   return (
-    <nav className="app-navigation">
+    <nav className="flex gap-1">
       {currentApp.routes.map((route) => {
         const fullPath = `${currentApp.basePath}/${route.path}`
         return (
           <Link
             key={fullPath}
             to={fullPath}
-            className="app-nav-link"
-            activeProps={{ className: 'app-nav-link active' }}
+            className="rounded-md px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+            activeProps={{ className: 'rounded-md px-4 py-2 text-sm font-medium bg-primary text-primary-foreground' }}
           >
             {route.label}
           </Link>

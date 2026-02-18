@@ -1,8 +1,9 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { toast } from 'sonner'
+import './index.css'
 import App from './App'
-import { useAlertStore } from '@/shared/store'
 import { getErrorMessage } from './apps/guardrails/errors'
 
 const queryClient = new QueryClient({
@@ -13,7 +14,7 @@ const queryClient = new QueryClient({
     },
     mutations: {
       onError: (error) => {
-        useAlertStore.getState().addAlert('error', getErrorMessage(error))
+        toast.error(getErrorMessage(error))
       },
     },
   },
@@ -23,7 +24,7 @@ const queryClient = new QueryClient({
 queryClient.getQueryCache().subscribe((event) => {
   if (event.type === 'updated' && event.query.state.status === 'error') {
     const error = event.query.state.error
-    useAlertStore.getState().addAlert('error', getErrorMessage(error))
+    toast.error(getErrorMessage(error))
   }
 })
 

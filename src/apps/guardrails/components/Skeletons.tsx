@@ -1,16 +1,28 @@
-// Skeleton components for loading states
-// Uses CSS animation for pulse effect
+import {
+  Card,
+  CardHeader,
+  CardAction,
+  CardContent,
+} from '@/shared/components/ui/card'
+import { Skeleton } from '@/shared/components/ui/skeleton'
 
 export function MetricCardSkeleton() {
   return (
-    <div className="metric-card skeleton">
-      <div className="metric-card-content">
-        <div className="skeleton-text skeleton-text-sm" />
-        <div className="skeleton-text skeleton-text-lg" />
-        <div className="skeleton-text skeleton-text-sm" />
-      </div>
-      <div className="skeleton-icon" />
-    </div>
+    <Card>
+      <CardHeader>
+        <Skeleton className="h-4 w-28" />
+        <CardAction>
+          <Skeleton className="size-5 rounded" />
+        </CardAction>
+      </CardHeader>
+      <CardContent className="flex flex-col gap-2">
+        <div className="flex items-baseline gap-2">
+          <Skeleton className="h-7 w-20" />
+          <Skeleton className="h-4 w-14" />
+        </div>
+        <Skeleton className="h-3 w-36" />
+      </CardContent>
+    </Card>
   )
 }
 
@@ -26,9 +38,9 @@ export function MetricCardsSkeleton({ count = 4 }: { count?: number }) {
 
 export function PieChartSkeleton() {
   return (
-    <div className="pie-chart skeleton">
-      <div className="skeleton-circle" />
-      <div className="skeleton-text skeleton-text-sm" />
+    <div className="flex flex-col items-center gap-1.5">
+      <Skeleton className="size-[72px] rounded-full" />
+      <Skeleton className="h-3 w-16" />
     </div>
   )
 }
@@ -45,18 +57,18 @@ export function PieChartsSkeleton({ count = 6 }: { count?: number }) {
 
 export function ChartSkeleton() {
   return (
-    <div className="chart skeleton">
-      <div className="chart-header">
-        <div className="skeleton-icon-sm" />
-        <div className="chart-titles">
-          <div className="skeleton-text skeleton-text-md" />
-          <div className="skeleton-text skeleton-text-sm" />
-        </div>
-      </div>
-      <div className="chart-content">
-        <div className="skeleton-chart-area" />
-      </div>
-    </div>
+    <Card>
+      <CardHeader>
+        <Skeleton className="h-4 w-28" />
+        <Skeleton className="h-3 w-40" />
+        <CardAction>
+          <Skeleton className="size-5 rounded" />
+        </CardAction>
+      </CardHeader>
+      <CardContent className="h-[250px]">
+        <Skeleton className="h-full w-full rounded-md" />
+      </CardContent>
+    </Card>
   )
 }
 
@@ -72,20 +84,30 @@ export function ChartsSkeleton({ count = 3 }: { count?: number }) {
 
 export function TableSkeleton({ rows = 4 }: { rows?: number }) {
   return (
-    <div className="data-table skeleton">
-      <div className="data-table-header">
-        <div className="skeleton-text skeleton-text-md" />
-      </div>
-      <div className="skeleton-table-rows">
-        {Array.from({ length: rows }).map((_, i) => (
-          <div key={i} className="skeleton-table-row">
-            <div className="skeleton-text skeleton-text-sm" />
-            <div className="skeleton-text skeleton-text-md" />
-            <div className="skeleton-text skeleton-text-sm" />
-            <div className="skeleton-text skeleton-text-sm" />
+    <Card>
+      <CardHeader>
+        <Skeleton className="h-5 w-32" />
+      </CardHeader>
+      <CardContent>
+        <div className="overflow-hidden rounded-md border">
+          <div className="flex items-center gap-4 bg-muted px-4 py-3">
+            <Skeleton className="h-3 w-20" />
+            <Skeleton className="h-3 w-24" />
+            <Skeleton className="h-3 w-16" />
+            <Skeleton className="h-3 w-20" />
+            <Skeleton className="h-3 w-16" />
           </div>
-        ))}
-      </div>
-    </div>
+          {Array.from({ length: rows }).map((_, i) => (
+            <div key={i} className="flex items-center gap-4 border-t px-4 py-3">
+              <Skeleton className="h-4 w-20" />
+              <Skeleton className="h-4 w-24" />
+              <Skeleton className="h-4 w-16" />
+              <Skeleton className="h-4 w-20" />
+              <Skeleton className="h-4 w-16" />
+            </div>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
   )
 }

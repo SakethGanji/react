@@ -17,12 +17,12 @@ export const BaseChart = memo(function BaseChart({
 
   return (
     <div
-      className={`echarts-container ${className}`}
+      className={`h-full w-full min-h-[100px] ${className}`}
       style={{ height: typeof height === 'number' ? `${height}px` : height }}
     >
       {loading ? (
-        <div className="echarts-loading">
-          <div className="echarts-loading-spinner" />
+        <div className="flex h-full w-full min-h-[100px] items-center justify-center">
+          <div className="size-8 animate-spin rounded-full border-[3px] border-border border-t-primary" />
         </div>
       ) : (
         <div ref={chartRef} style={{ width: '100%', height: '100%' }} />

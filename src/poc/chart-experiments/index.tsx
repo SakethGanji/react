@@ -1,4 +1,5 @@
 import { LineChart, AreaChart, StackedBarChart, PieChart } from '@/shared/charts'
+import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui/card'
 
 const sampleLineData = [30, 40, 35, 50, 49, 60, 70, 91, 85, 95]
 const sampleAreaData = [20, 30, 45, 35, 55, 60, 65, 75, 70, 80]
@@ -18,44 +19,56 @@ const pieData = [
 
 export default function ChartExperiments() {
   return (
-    <main className="poc-content">
-      <h1>Chart Experiments</h1>
-      <p>Testing various chart configurations and styles.</p>
+    <main className="mx-auto max-w-[1400px] space-y-8 p-6">
+      <div>
+        <h1 className="text-3xl font-bold text-foreground">Chart Experiments</h1>
+        <p className="mt-2 text-muted-foreground">Testing various chart configurations and styles.</p>
+      </div>
 
-      <section className="poc-section">
-        <h2>Line Chart</h2>
-        <div className="poc-chart-container">
+      <Card>
+        <CardHeader>
+          <CardTitle>Line Chart</CardTitle>
+        </CardHeader>
+        <CardContent>
           <LineChart data={sampleLineData} smooth height={300} />
-        </div>
-      </section>
+        </CardContent>
+      </Card>
 
-      <section className="poc-section">
-        <h2>Area Chart</h2>
-        <div className="poc-chart-container">
+      <Card>
+        <CardHeader>
+          <CardTitle>Area Chart</CardTitle>
+        </CardHeader>
+        <CardContent>
           <AreaChart data={sampleAreaData} seriesName="Revenue" height={300} />
-        </div>
-      </section>
+        </CardContent>
+      </Card>
 
-      <section className="poc-section">
-        <h2>Stacked Bar Chart</h2>
-        <div className="poc-chart-container">
+      <Card>
+        <CardHeader>
+          <CardTitle>Stacked Bar Chart</CardTitle>
+        </CardHeader>
+        <CardContent>
           <StackedBarChart series={stackedSeries} height={300} />
-        </div>
-      </section>
+        </CardContent>
+      </Card>
 
-      <section className="poc-section">
-        <h2>Pie Chart</h2>
-        <div className="poc-chart-container">
+      <Card>
+        <CardHeader>
+          <CardTitle>Pie Chart</CardTitle>
+        </CardHeader>
+        <CardContent>
           <PieChart data={pieData} height={300} />
-        </div>
-      </section>
+        </CardContent>
+      </Card>
 
-      <section className="poc-section">
-        <h2>Donut Chart</h2>
-        <div className="poc-chart-container">
+      <Card>
+        <CardHeader>
+          <CardTitle>Donut Chart</CardTitle>
+        </CardHeader>
+        <CardContent>
           <PieChart data={pieData} innerRadius="50%" height={300} />
-        </div>
-      </section>
+        </CardContent>
+      </Card>
     </main>
   )
 }

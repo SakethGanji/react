@@ -42,7 +42,7 @@ export const citiLightTheme: EChartsOption = {
   color: CHART_PALETTE,
   backgroundColor: 'transparent',
   textStyle: {
-    fontFamily: '"Interstate", "Helvetica Neue", Arial, sans-serif',
+    fontFamily: '"Inter", ui-sans-serif, sans-serif, system-ui',
     color: CITI_COLORS.gray700,
   },
   title: {
@@ -121,7 +121,7 @@ export const citiDarkTheme: EChartsOption = {
   color: CHART_PALETTE,
   backgroundColor: 'transparent',
   textStyle: {
-    fontFamily: '"Interstate", "Helvetica Neue", Arial, sans-serif',
+    fontFamily: '"Inter", ui-sans-serif, sans-serif, system-ui',
     color: '#E5E5E5',
   },
   title: {

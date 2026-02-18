@@ -48,7 +48,7 @@ const appRoutes = APP_REGISTRY.flatMap((app) => {
       getParentRoute: () => appLayoutRoute,
       path: `${app.basePath}/${route.path}`,
       component: () => (
-        <Suspense fallback={<div className="loading">Loading...</div>}>
+        <Suspense fallback={<div className="flex items-center justify-center py-12 text-muted-foreground">Loading...</div>}>
           <Component />
         </Suspense>
       ),
@@ -92,7 +92,7 @@ if (import.meta.env.DEV) {
 
       if (!poc) {
         return (
-          <main className="poc-content">
+          <main className="mx-auto max-w-[1400px] p-6">
             <h1>POC Not Found</h1>
             <p>The requested POC does not exist.</p>
           </main>
@@ -102,7 +102,7 @@ if (import.meta.env.DEV) {
       const Component = poc.component
 
       return (
-        <Suspense fallback={<div className="loading">Loading POC...</div>}>
+        <Suspense fallback={<div className="flex items-center justify-center py-12 text-muted-foreground">Loading POC...</div>}>
           <Component />
         </Suspense>
       )

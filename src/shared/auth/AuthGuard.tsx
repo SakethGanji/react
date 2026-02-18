@@ -29,10 +29,8 @@ export function AuthGuard({ children }: AuthGuardProps) {
 
   if (checking) {
     return (
-      <div className="dashboard">
-        <div className="dashboard-content">
-          <div className="loading">Authenticating...</div>
-        </div>
+      <div className="flex min-h-svh items-center justify-center text-muted-foreground">
+        Authenticating...
       </div>
     )
   }
