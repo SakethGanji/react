@@ -1,5 +1,4 @@
-import { Outlet, Link } from '@tanstack/react-router'
-import { ArrowLeft } from 'lucide-react'
+import { Outlet } from '@tanstack/react-router'
 import { useUIStore } from '@/shared/store'
 import { Badge } from '@/shared/components/ui/badge'
 
@@ -11,11 +10,7 @@ export function PocLayout() {
 
   return (
     <div className={`min-h-svh bg-background ${theme === 'dark' ? 'dark' : ''}`}>
-      <header className="flex items-center justify-between border-b bg-card px-6 py-4">
-        <Link to="/gallery" className="flex items-center gap-2 text-sm font-medium text-muted-foreground transition-colors hover:text-primary">
-          <ArrowLeft size={18} />
-          <span>Back to Gallery</span>
-        </Link>
+      <header className="flex items-center justify-end border-b bg-card px-6 py-4">
         <Badge variant="secondary">POC</Badge>
       </header>
       <Outlet />

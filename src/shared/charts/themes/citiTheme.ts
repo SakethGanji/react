@@ -1,23 +1,31 @@
 import type { EChartsOption } from 'echarts'
 
-// Official Citi Brand Colors
+/** Read a CSS custom property value at runtime */
+function cssVar(name: string): string {
+  return getComputedStyle(document.documentElement).getPropertyValue(name).trim()
+}
+
+/** Return the 10-color pastel palette from CSS vars (theme-aware) */
+export function getPastelPalette(): string[] {
+  return Array.from({ length: 10 }, (_, i) => cssVar(`--chart-${i + 1}`))
+}
+
+// Light-mode fallbacks (used where a static value is needed)
+export const CHART_COLORS = {
+  indigo:  '#818cf8',
+  gold:    '#facc15',
+  emerald: '#34d399',
+  red:     '#f87171',
+  cyan:    '#22d3ee',
+  purple:  '#c084fc',
+  orange:  '#fb923c',
+  teal:    '#2dd4bf',
+  slate:   '#94a3b8',
+  violet:  '#a78bfa',
+}
+
+// Keep CITI_COLORS export for any remaining neutral usages
 export const CITI_COLORS = {
-  // Primary brand colors
-  ateneoBlue: '#003B70',      // Primary Citi blue
-  maximumRed: '#D9261C',      // Accent red
-
-  // Extended palette
-  primary: '#003B70',         // Ateneo Blue
-  secondary: '#00508C',       // Lighter blue
-  accent: '#0073CF',          // Bright blue for highlights
-  light: '#E8F4FC',           // Very light blue for backgrounds
-
-  // Semantic colors
-  success: '#00805A',         // Citi green
-  warning: '#C75B12',         // Orange
-  danger: '#D9261C',          // Maximum Red
-
-  // Neutrals
   gray100: '#F7F7F7',
   gray200: '#E5E5E5',
   gray300: '#CCCCCC',
@@ -26,23 +34,10 @@ export const CITI_COLORS = {
   gray900: '#1A1A1A',
 }
 
-// Professional Citi chart palette
-const CHART_PALETTE = [
-  CITI_COLORS.ateneoBlue,     // Primary blue
-  CITI_COLORS.accent,          // Bright blue
-  CITI_COLORS.secondary,       // Mid blue
-  CITI_COLORS.success,         // Green
-  CITI_COLORS.warning,         // Orange
-  CITI_COLORS.maximumRed,      // Red (used sparingly)
-  '#5B8FA8',                   // Muted teal
-  '#8B9DC3',                   // Muted purple-blue
-]
-
 export const citiLightTheme: EChartsOption = {
-  color: CHART_PALETTE,
   backgroundColor: 'transparent',
   textStyle: {
-    fontFamily: '"Inter", ui-sans-serif, sans-serif, system-ui',
+    fontFamily: '"DM Sans", ui-sans-serif, sans-serif, system-ui',
     color: CITI_COLORS.gray700,
   },
   title: {
@@ -62,7 +57,7 @@ export const citiLightTheme: EChartsOption = {
       color: CITI_COLORS.gray700,
       fontSize: 12,
     },
-    extraCssText: 'box-shadow: 0 2px 8px rgba(0, 59, 112, 0.12); border-radius: 4px;',
+    extraCssText: 'box-shadow: 0 2px 8px rgba(0,0,0,0.08); border-radius: 8px;',
   },
   legend: {
     textStyle: {
@@ -74,54 +69,23 @@ export const citiLightTheme: EChartsOption = {
     borderColor: CITI_COLORS.gray200,
   },
   categoryAxis: {
-    axisLine: {
-      lineStyle: {
-        color: CITI_COLORS.gray200,
-      },
-    },
-    axisTick: {
-      lineStyle: {
-        color: CITI_COLORS.gray300,
-      },
-    },
-    axisLabel: {
-      color: CITI_COLORS.gray500,
-      fontSize: 11,
-    },
-    splitLine: {
-      lineStyle: {
-        color: CITI_COLORS.gray100,
-      },
-    },
+    axisLine: { lineStyle: { color: CITI_COLORS.gray200 } },
+    axisTick: { lineStyle: { color: CITI_COLORS.gray300 } },
+    axisLabel: { color: CITI_COLORS.gray500, fontSize: 11 },
+    splitLine: { lineStyle: { color: CITI_COLORS.gray100 } },
   },
   valueAxis: {
-    axisLine: {
-      lineStyle: {
-        color: CITI_COLORS.gray200,
-      },
-    },
-    axisTick: {
-      lineStyle: {
-        color: CITI_COLORS.gray300,
-      },
-    },
-    axisLabel: {
-      color: CITI_COLORS.gray500,
-      fontSize: 11,
-    },
-    splitLine: {
-      lineStyle: {
-        color: CITI_COLORS.gray100,
-      },
-    },
+    axisLine: { lineStyle: { color: CITI_COLORS.gray200 } },
+    axisTick: { lineStyle: { color: CITI_COLORS.gray300 } },
+    axisLabel: { color: CITI_COLORS.gray500, fontSize: 11 },
+    splitLine: { lineStyle: { color: CITI_COLORS.gray100 } },
   },
 }
 
 export const citiDarkTheme: EChartsOption = {
-  color: CHART_PALETTE,
   backgroundColor: 'transparent',
   textStyle: {
-    fontFamily: '"Inter", ui-sans-serif, sans-serif, system-ui',
+    fontFamily: '"DM Sans", ui-sans-serif, sans-serif, system-ui',
     color: '#E5E5E5',
   },
   title: {
@@ -141,7 +105,7 @@ export const citiDarkTheme: EChartsOption = {
       color: '#E5E5E5',
       fontSize: 12,
     },
-    extraCssText: 'box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4); border-radius: 4px;',
+    extraCssText: 'box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4); border-radius: 8px;',
   },
   legend: {
     textStyle: {
@@ -153,49 +117,21 @@ export const citiDarkTheme: EChartsOption = {
     borderColor: '#2D3748',
   },
   categoryAxis: {
-    axisLine: {
-      lineStyle: {
-        color: '#2D3748',
-      },
-    },
-    axisTick: {
-      lineStyle: {
-        color: '#3D4A5C',
-      },
-    },
-    axisLabel: {
-      color: '#AAAAAA',
-      fontSize: 11,
-    },
-    splitLine: {
-      lineStyle: {
-        color: '#232D3B',
-      },
-    },
+    axisLine: { lineStyle: { color: '#2D3748' } },
+    axisTick: { lineStyle: { color: '#3D4A5C' } },
+    axisLabel: { color: '#AAAAAA', fontSize: 11 },
+    splitLine: { lineStyle: { color: '#232D3B' } },
   },
   valueAxis: {
-    axisLine: {
-      lineStyle: {
-        color: '#2D3748',
-      },
-    },
-    axisTick: {
-      lineStyle: {
-        color: '#3D4A5C',
-      },
-    },
-    axisLabel: {
-      color: '#AAAAAA',
-      fontSize: 11,
-    },
-    splitLine: {
-      lineStyle: {
-        color: '#232D3B',
-      },
-    },
+    axisLine: { lineStyle: { color: '#2D3748' } },
+    axisTick: { lineStyle: { color: '#3D4A5C' } },
+    axisLabel: { color: '#AAAAAA', fontSize: 11 },
+    splitLine: { lineStyle: { color: '#232D3B' } },
   },
 }
 
 export function getTheme(mode: 'light' | 'dark'): EChartsOption {
-  return mode === 'dark' ? citiDarkTheme : citiLightTheme
+  const palette = getPastelPalette()
+  const base = mode === 'dark' ? citiDarkTheme : citiLightTheme
+  return { ...base, color: palette }
 }

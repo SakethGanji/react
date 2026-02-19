@@ -2,7 +2,7 @@ import { memo, useMemo } from 'react'
 import type { EChartsOption } from 'echarts'
 import type { BarChartProps } from '../types'
 import { BaseChart } from './BaseChart'
-import { CITI_COLORS } from '../themes/citiTheme'
+import { getPastelPalette } from '../themes/citiTheme'
 
 export const BarChart = memo(function BarChart({
   data,
@@ -16,6 +16,7 @@ export const BarChart = memo(function BarChart({
 }: BarChartProps) {
   const options = useMemo<EChartsOption>(() => {
     const axisData = xAxisData || data.map((_, i) => String(i + 1))
+    const palette = getPastelPalette()
 
     const categoryAxis = {
       type: 'category' as const,
@@ -63,7 +64,7 @@ export const BarChart = memo(function BarChart({
           type: 'bar',
           data,
           itemStyle: {
-            color: CITI_COLORS.ateneoBlue,
+            color: palette[0],
             borderRadius: [2, 2, 0, 0],
           },
           barMaxWidth: 40,

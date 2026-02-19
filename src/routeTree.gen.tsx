@@ -66,7 +66,6 @@ const appRoutes = APP_REGISTRY.flatMap((app) => {
 // production builds, making the block dead code. The tree-shaker then
 // drops these imports (and their transitive dependencies) from the bundle.
 import { PocLayout, pocBeforeLoad } from './routes/_poc'
-import { PocGallery } from './poc/PocGallery'
 import { POC_REGISTRY, getPocByPath } from './poc'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -78,12 +77,6 @@ if (import.meta.env.DEV) {
     id: '_poc',
     component: PocLayout,
     beforeLoad: pocBeforeLoad,
-  })
-
-  const pocGalleryRoute = createRoute({
-    getParentRoute: () => pocLayoutRoute,
-    path: '/gallery',
-    component: PocGallery,
   })
 
   function createPocComponent(pocPath: string) {
@@ -117,7 +110,7 @@ if (import.meta.env.DEV) {
     })
   )
 
-  pocRouteTree = [pocLayoutRoute.addChildren([pocGalleryRoute, ...pocRoutes])]
+  pocRouteTree = [pocLayoutRoute.addChildren([...pocRoutes])]
 }
 
 // =============================================================================

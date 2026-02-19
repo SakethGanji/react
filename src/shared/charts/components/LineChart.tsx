@@ -2,7 +2,7 @@ import { memo, useMemo } from 'react'
 import type { EChartsOption } from 'echarts'
 import type { LineChartProps } from '../types'
 import { BaseChart } from './BaseChart'
-import { CITI_COLORS } from '../themes/citiTheme'
+import { getPastelPalette } from '../themes/citiTheme'
 
 export const LineChart = memo(function LineChart({
   data,
@@ -17,6 +17,8 @@ export const LineChart = memo(function LineChart({
 }: LineChartProps) {
   const options = useMemo<EChartsOption>(() => {
     const xAxis = xAxisData || data.map((_, i) => String(i + 1))
+    const palette = getPastelPalette()
+    const color = palette[0]
 
     return {
       ...customOptions,
@@ -61,7 +63,7 @@ export const LineChart = memo(function LineChart({
           symbol: 'none',
           lineStyle: {
             width: 2,
-            color: CITI_COLORS.ateneoBlue,
+            color,
           },
           ...(areaStyle && {
             areaStyle: {
@@ -72,8 +74,8 @@ export const LineChart = memo(function LineChart({
                 x2: 0,
                 y2: 1,
                 colorStops: [
-                  { offset: 0, color: `${CITI_COLORS.ateneoBlue}30` },
-                  { offset: 1, color: `${CITI_COLORS.ateneoBlue}05` },
+                  { offset: 0, color: `${color}80` },
+                  { offset: 1, color: `${color}10` },
                 ],
               },
             },

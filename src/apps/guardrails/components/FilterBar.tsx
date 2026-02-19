@@ -108,7 +108,7 @@ export function FilterBar() {
     <Card>
       <CardContent className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
         <div className="space-y-1">
-          <h2 className="text-lg font-semibold">Dashboard Overview</h2>
+          <h1 className="text-2xl font-normal tracking-tight">Dashboard Overview</h1>
           <span className="text-sm text-muted-foreground">
             Last updated: {formatLastUpdated(lastUpdated)}
           </span>
@@ -134,6 +134,8 @@ export function FilterBar() {
             </Select>
           </div>
 
+          <div className="h-8 w-px bg-border" />
+
           <div className="flex flex-col gap-1.5">
             <Label className="text-sm font-medium">Status</Label>
             <Select
@@ -153,6 +155,8 @@ export function FilterBar() {
             </Select>
           </div>
 
+          <div className="h-8 w-px bg-border" />
+
           <div className="flex flex-col gap-1.5">
             <Label className="text-sm font-medium">Start</Label>
             <DatePicker
@@ -171,7 +175,9 @@ export function FilterBar() {
             />
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="h-8 w-px bg-border" />
+
+          <div className="flex flex-col gap-1.5">
             <Button
               size="sm"
               onClick={handleApply}
@@ -179,9 +185,8 @@ export function FilterBar() {
             >
               {isDirty ? 'Apply Filters' : 'Applied'}
             </Button>
-
             {hasActiveFilters && (
-              <Button variant="outline" size="sm" onClick={handleReset}>
+              <Button variant="ghost" size="sm" className="text-muted-foreground" onClick={handleReset}>
                 Clear
               </Button>
             )}

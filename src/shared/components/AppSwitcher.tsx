@@ -24,7 +24,7 @@ export function AppSwitcher({ currentPath }: AppSwitcherProps) {
 
   if (APP_REGISTRY.length <= 1) {
     return (
-      <span className="text-lg font-semibold text-foreground">
+      <span className="text-lg font-semibold text-primary-foreground">
         {currentApp?.name ?? 'Dashboard'}
       </span>
     )
@@ -33,7 +33,7 @@ export function AppSwitcher({ currentPath }: AppSwitcherProps) {
   return (
     <div className="relative" ref={dropdownRef}>
       <button
-        className="flex items-center gap-2 rounded-md border border-transparent px-3 py-2 text-lg font-semibold text-foreground transition-colors hover:border-border hover:bg-muted"
+        className="flex items-center gap-2 rounded-md border border-transparent px-3 py-2 text-lg font-semibold text-primary-foreground transition-colors hover:bg-white/15"
         onClick={() => setIsOpen(!isOpen)}
         aria-expanded={isOpen}
         aria-haspopup="listbox"

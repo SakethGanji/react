@@ -42,13 +42,13 @@ export function Dashboard() {
 
   return (
     <div className="@container/main flex flex-1 flex-col gap-2">
-      <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
+      <div className="flex flex-col gap-6 py-4 md:gap-8 md:py-6">
         <div className="px-4 lg:px-6">
           <FilterBar />
         </div>
 
         {/* Metric Cards */}
-        <div className="grid grid-cols-1 gap-4 px-4 sm:grid-cols-2 lg:px-6 @xl/main:grid-cols-2 @5xl/main:grid-cols-4">
+        <div className="grid grid-cols-1 gap-5 px-4 sm:grid-cols-2 lg:px-6 @xl/main:grid-cols-2 @5xl/main:grid-cols-4">
           {metrics.isLoading ? (
             <MetricCardsSkeleton count={4} />
           ) : metrics.error ? (
@@ -98,7 +98,7 @@ export function Dashboard() {
         </div>
 
         {/* Charts */}
-        <div className="grid grid-cols-1 gap-4 px-4 md:grid-cols-2 lg:grid-cols-3 lg:px-6">
+        <div className="grid grid-cols-1 gap-5 px-4 md:grid-cols-2 lg:grid-cols-3 lg:px-6">
           {charts.isLoading ? (
             <ChartsSkeleton count={3} />
           ) : charts.error ? (

@@ -1,4 +1,5 @@
 import type { TableRow } from '../types'
+import { cn } from '@/shared/lib/utils'
 import { Card, CardHeader, CardTitle, CardContent } from '@/shared/components/ui/card'
 import {
   Table,
@@ -16,10 +17,10 @@ interface DataTableProps {
   onRowClick?: (row: TableRow) => void
 }
 
-const statusVariant: Record<string, 'default' | 'secondary' | 'outline'> = {
-  active: 'default',
-  scaling: 'secondary',
-  review: 'outline',
+const statusStyles: Record<string, string> = {
+  active: 'bg-chart-3/20 text-emerald-600 dark:text-chart-3',
+  scaling: 'bg-chart-2/20 text-yellow-600 dark:text-chart-2',
+  review: 'bg-chart-9/20 text-chart-9',
 }
 
 export function DataTable({ title, data, onRowClick }: DataTableProps) {
@@ -36,9 +37,9 @@ export function DataTable({ title, data, onRowClick }: DataTableProps) {
             <p>No data available</p>
           </div>
         ) : (
-          <div className="overflow-hidden rounded-md border">
+          <div className="overflow-hidden rounded-md">
             <Table>
-              <TableHeader className="bg-muted">
+              <TableHeader className="bg-muted/40">
                 <TRow>
                   <TableHead>Module ID</TableHead>
                   <TableHead>Classification</TableHead>
@@ -63,9 +64,9 @@ export function DataTable({ title, data, onRowClick }: DataTableProps) {
                     <TableCell>{row.load}</TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
-                        <div className="h-2 w-20 overflow-hidden rounded-full bg-muted">
+                        <div className="h-1.5 w-20 overflow-hidden rounded-full bg-muted">
                           <div
-                            className="h-full rounded-full bg-primary transition-all"
+                            className="h-full rounded-full bg-chart-1 transition-all"
                             style={{ width: `${row.efficiency}%` }}
                           />
                         </div>
@@ -73,7 +74,7 @@ export function DataTable({ title, data, onRowClick }: DataTableProps) {
                       </div>
                     </TableCell>
                     <TableCell>
-                      <Badge variant={statusVariant[row.status] ?? 'outline'} className="text-muted-foreground px-1.5">
+                      <Badge variant="outline" className={cn("border-0 px-1.5", statusStyles[row.status] ?? 'bg-slate-100 text-slate-600')}>
                         {row.status}
                       </Badge>
                     </TableCell>

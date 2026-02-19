@@ -2,7 +2,7 @@ import { memo, useMemo } from 'react'
 import type { EChartsOption } from 'echarts'
 import type { BaseChartProps } from '../types'
 import { BaseChart } from './BaseChart'
-import { CITI_COLORS } from '../themes/citiTheme'
+import { getPastelPalette } from '../themes/citiTheme'
 
 export interface StackedBarChartSeries {
   name: string
@@ -16,15 +16,6 @@ export interface StackedBarChartProps extends BaseChartProps {
   horizontal?: boolean
 }
 
-const DEFAULT_COLORS = [
-  CITI_COLORS.ateneoBlue,    // #003B70 - Citi Blue
-  CITI_COLORS.success,        // #00805A - Green
-  CITI_COLORS.warning,        // #C75B12 - Orange
-  '#6B5B95',                  // Purple
-  '#5B8FA8',                  // Teal
-  '#E8B04B',                  // Gold
-]
-
 export const StackedBarChart = memo(function StackedBarChart({
   series,
   xAxisData,
@@ -36,6 +27,7 @@ export const StackedBarChart = memo(function StackedBarChart({
 }: StackedBarChartProps) {
   const options = useMemo<EChartsOption>(() => {
     const axisData = xAxisData || series[0]?.data.map((_, i) => String(i + 1)) || []
+    const palette = getPastelPalette()
 
     const categoryAxis = {
       type: 'category' as const,
@@ -54,7 +46,7 @@ export const StackedBarChart = memo(function StackedBarChart({
       stack: 'total',
       data: s.data,
       itemStyle: {
-        color: s.color || DEFAULT_COLORS[index % DEFAULT_COLORS.length],
+        color: s.color || palette[index % palette.length],
         borderRadius: index === series.length - 1 ? [2, 2, 0, 0] : 0,
       },
       barMaxWidth: 40,

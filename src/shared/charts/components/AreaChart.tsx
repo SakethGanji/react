@@ -2,7 +2,7 @@ import { memo, useMemo } from 'react'
 import type { EChartsOption } from 'echarts'
 import type { BaseChartProps } from '../types'
 import { BaseChart } from './BaseChart'
-import { CITI_COLORS } from '../themes/citiTheme'
+import { getPastelPalette } from '../themes/citiTheme'
 
 export interface AreaChartProps extends BaseChartProps {
   data: number[]
@@ -15,7 +15,7 @@ export const AreaChart = memo(function AreaChart({
   data,
   xAxisData,
   seriesName = 'Value',
-  color = CITI_COLORS.accent,  // Bright Citi blue
+  color,
   className,
   loading,
   height,
@@ -23,6 +23,7 @@ export const AreaChart = memo(function AreaChart({
 }: AreaChartProps) {
   const options = useMemo<EChartsOption>(() => {
     const xAxis = xAxisData || data.map((_, i) => String(i + 1))
+    const fillColor = color || getPastelPalette()[8] // purple by default
 
     return {
       ...customOptions,
@@ -78,13 +79,13 @@ export const AreaChart = memo(function AreaChart({
               x2: 0,
               y2: 1,
               colorStops: [
-                { offset: 0, color: `${color}` },
-                { offset: 1, color: `${color}20` },
+                { offset: 0, color: fillColor },
+                { offset: 1, color: `${fillColor}30` },
               ],
             },
           },
           itemStyle: {
-            color: color,
+            color: fillColor,
           },
         },
       ],

@@ -16,6 +16,7 @@ export interface AppEntry {
   basePath: string
   defaultRoute: string
   routes: AppRoute[]
+  header?: ComponentType
 }
 
 export const APP_REGISTRY: AppEntry[] = [
