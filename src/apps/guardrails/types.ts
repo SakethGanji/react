@@ -209,6 +209,58 @@ export interface NotificationSettings {
   frequency: string
 }
 
+// Monitoring Settings
+export interface EmailNotificationSettings {
+  hours: number
+  minutes: number
+}
+
+export interface AlertThresholds {
+  input_guardrails: number
+  contextual_relevancy: number
+  bias_fairness: number
+  hallucination: number
+  factual_accuracy: number
+  output_moderation: number
+}
+
+export interface MonitoringSettings {
+  emailNotifications: EmailNotificationSettings
+  alertThresholds: AlertThresholds
+}
+
+// Prompt Configuration
+export interface PromptConfig {
+  workflowName: string
+  promptName: string
+  systemInstructions: string
+  changeNotes: string
+  createdBy: string
+}
+
+export const DEFAULT_ALERT_THRESHOLDS: AlertThresholds = {
+  input_guardrails: 0.85,
+  contextual_relevancy: 0.85,
+  bias_fairness: 0.85,
+  hallucination: 0.85,
+  factual_accuracy: 0.85,
+  output_moderation: 0.85,
+}
+
+export const DEFAULT_EMAIL_NOTIFICATIONS: EmailNotificationSettings = {
+  hours: 1,
+  minutes: 0,
+}
+
+export const THRESHOLD_LABELS: Record<keyof AlertThresholds, string> = {
+  input_guardrails: 'Input Guardrails',
+  contextual_relevancy: 'Contextual Relevancy',
+  bias_fairness: 'Bias and Fairness',
+  hallucination: 'Hallucination',
+  factual_accuracy: 'Factual Accuracy',
+  output_moderation: 'Output Moderation',
+}
+
 // ============================================
 // Messages Table Types (Infinite Scroll)
 // ============================================
