@@ -262,6 +262,22 @@ export const THRESHOLD_LABELS: Record<keyof AlertThresholds, string> = {
 }
 
 // ============================================
+// Audit Log Types (Configuration Change History)
+// ============================================
+
+export interface AuditLogEntry {
+  id: string
+  timestamp: string
+  user: string
+  action: 'created' | 'updated' | 'deleted' | 'restored'
+  category: 'monitoring' | 'prompt' | 'threshold' | 'notification'
+  setting: string
+  oldValue: string | null
+  newValue: string
+  notes?: string
+}
+
+// ============================================
 // Messages Table Types (Infinite Scroll)
 // ============================================
 
