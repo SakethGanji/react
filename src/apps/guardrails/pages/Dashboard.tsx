@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import {
   MetricCard,
-  DataTable,
+  MessagesTable,
   FilterBar,
   EChartsChart,
   EChartsPieChart,
@@ -9,12 +9,11 @@ import {
   MetricCardsSkeleton,
   PieChartsSkeleton,
   ChartsSkeleton,
-  TableSkeleton,
 } from '../components'
-import { useMetrics, useDistribution, useTableData, useCharts } from '../hooks'
+import { useMetrics, useDistribution, useCharts } from '../hooks'
 import { getErrorMessage } from '../errors'
 import { Card, CardHeader, CardTitle, CardContent } from '@/shared/components/ui/card'
-import type { TableRow } from '../types'
+import type { MessageRow } from '../types'
 
 function SectionError({ error }: { error: unknown }) {
   return (
@@ -27,13 +26,12 @@ function SectionError({ error }: { error: unknown }) {
 export function Dashboard() {
   const metrics = useMetrics()
   const distribution = useDistribution()
-  const tableData = useTableData()
   const charts = useCharts()
 
   const [selectedConversationId, setSelectedConversationId] = useState<string | null>(null)
 
-  const handleRowClick = (row: TableRow) => {
-    setSelectedConversationId(row.id)
+  const handleRowClick = (row: MessageRow) => {
+    setSelectedConversationId(row.conversation_id)
   }
 
   const handleCloseModal = () => {
@@ -82,19 +80,9 @@ export function Dashboard() {
           </Card>
         </div>
 
-        {/* Operational Log */}
+        {/* Messages Table */}
         <div className="px-4 lg:px-6">
-          {tableData.isLoading ? (
-            <TableSkeleton rows={4} />
-          ) : tableData.error ? (
-            <SectionError error={tableData.error} />
-          ) : (
-            <DataTable
-              title="Operational Log"
-              data={tableData.data ?? []}
-              onRowClick={handleRowClick}
-            />
-          )}
+          <MessagesTable onRowClick={handleRowClick} />
         </div>
 
         {/* Charts */}

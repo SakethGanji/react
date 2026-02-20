@@ -1,6 +1,9 @@
 from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
 from typing import Optional
+import random
+import hashlib
+from datetime import datetime, timedelta
 
 app = FastAPI()
 
@@ -228,4 +231,134 @@ def get_charts_metrics(
             "lob": lob,
             "topic": topic
         }
+    }
+
+
+# ============================================
+# Messages Table (Infinite Scroll) - Dummy Data
+# ============================================
+
+JOBS = ["customer_support", "sales_inquiry", "tech_support", "billing", "general"]
+INTENTS = ["greeting", "complaint", "question", "request", "feedback", "escalation"]
+TOPICS = [["billing"], ["account", "security"], ["product"], ["shipping"], ["returns"], ["general"]]
+GUARDRAIL_TYPES = [
+    "Input Guardrails", "Contextual Relevancy", "Bias and Fairness",
+    "Hallucination", "Factual Accuracy", "Output Moderation",
+]
+USER_MESSAGES = [
+    "I need help with my account balance",
+    "Can you explain my recent charges?",
+    "My order hasn't arrived yet",
+    "I want to cancel my subscription",
+    "How do I reset my password?",
+    "I'm having trouble logging in",
+    "What are your business hours?",
+    "I'd like to speak with a manager",
+    "Can you update my shipping address?",
+    "I received a damaged product",
+    "How do I apply a promo code?",
+    "What's your return policy?",
+    "I need a refund for my purchase",
+    "Can you help me track my order?",
+    "I'm interested in upgrading my plan",
+]
+MODEL_RESPONSES = [
+    "I'd be happy to help you with that. Let me look into your account.",
+    "Sure, I can see your recent transactions. Let me walk you through them.",
+    "I understand your concern. Let me check the shipping status for you.",
+    "I'm sorry to hear that. Let me process that cancellation for you.",
+    "You can reset your password by clicking the 'Forgot Password' link.",
+    "Let me troubleshoot the login issue. Can you try clearing your browser cache?",
+    "Our business hours are Monday through Friday, 9 AM to 6 PM EST.",
+    "I'll connect you with a supervisor right away. Please hold.",
+    "I've updated your shipping address. The change will take effect immediately.",
+    "I apologize for the inconvenience. Let me arrange a replacement for you.",
+    "You can enter the promo code at checkout in the discount field.",
+    "Our return policy allows returns within 30 days of purchase with receipt.",
+    "I've initiated the refund. It should appear in 3-5 business days.",
+    "Your order is currently in transit. Here's your tracking number.",
+    "Great choice! Let me show you the available upgrade options.",
+]
+
+# Pre-generate 1000 rows for the dummy dataset
+random.seed(42)
+TOTAL_MESSAGES = 1000
+_base_time = datetime(2026, 2, 20, 0, 0, 0)
+MESSAGES_DB = []
+for i in range(TOTAL_MESSAGES):
+    ts = _base_time - timedelta(minutes=i * 3, seconds=random.randint(0, 59))
+    conv_id = hashlib.md5(f"conv-{i // 3}".encode()).hexdigest()[:24]
+    guardrails = {}
+    for g in random.sample(GUARDRAIL_TYPES, random.randint(2, 5)):
+        result = random.choice(["Delivered", "Delivered", "Delivered", "Blocked"])
+        guardrails[g] = {
+            "Result": result,
+            "Score": round(random.uniform(0.5, 1.0), 3),
+            "Reason": f"Auto-evaluated by {g.lower()} checker",
+        }
+    MESSAGES_DB.append({
+        "conversation_id": conv_id,
+        "timestamp": ts.isoformat() + "Z",
+        "job": random.choice(JOBS),
+        "intent": random.choice(INTENTS),
+        "user_utterance": random.choice(USER_MESSAGES),
+        "model_response_text": random.choice(MODEL_RESPONSES),
+        "total_model_time": [round(random.uniform(0.1, 2.5), 3)],
+        "topic": random.choice(TOPICS),
+        "guardrail_results": guardrails,
+    })
+
+
+@app.get("/api/messages/table")
+def get_messages_table(
+    limit: int = Query(50, ge=1, le=200),
+    sort_dir: str = Query("desc"),
+    cursor: Optional[str] = Query(None),
+    job: Optional[str] = Query(None),
+    intent: Optional[str] = Query(None),
+    text_search: Optional[str] = Query(None),
+    conversation_id: Optional[str] = Query(None),
+):
+    # Filter data
+    rows = list(MESSAGES_DB)
+    if job:
+        rows = [r for r in rows if r["job"] == job]
+    if intent:
+        rows = [r for r in rows if r["intent"] == intent]
+    if conversation_id:
+        rows = [r for r in rows if conversation_id in r["conversation_id"]]
+    if text_search:
+        q = text_search.lower()
+        rows = [r for r in rows if q in r["user_utterance"].lower() or q in r["model_response_text"].lower()]
+
+    # Sort data
+    rows.sort(key=lambda r: r["timestamp"], reverse=(sort_dir == "desc"))
+
+    # Cursor-based pagination: cursor is the index offset
+    start = 0
+    if cursor:
+        start = int(cursor)
+
+    end = start + limit
+    page = rows[start:end]
+    has_more = end < len(rows)
+    total = len(rows)
+
+    return {
+        "pagination": {
+            "limit": limit,
+            "has_more": has_more,
+            "next_cursor": str(end) if has_more else None,
+            "total": total,
+        },
+        "filters": {
+            "start_date": None,
+            "end_date": None,
+            "job": job,
+            "intent": intent,
+            "text_search": text_search,
+            "conversation_id": conversation_id,
+            "sort_dir": sort_dir,
+        },
+        "data": page,
     }

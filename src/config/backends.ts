@@ -17,7 +17,7 @@ interface Backends {
 // Add your environments here
 const ENVIRONMENTS: Record<string, Backends> = {
   'localhost': {
-    dashboard: 'http://localhost:8000',
+    dashboard: 'http://localhost:9000',
     settings: 'http://localhost:8000',   // Change port when running separate service
     guardrails: 'http://localhost:8000', // Change port when running separate service
   },

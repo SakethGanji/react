@@ -1,5 +1,6 @@
 export { MetricCard } from './MetricCard'
 export { DataTable } from './DataTable'
+export { MessagesTable } from './MessagesTable'
 export { FilterBar } from './FilterBar'
 export { EChartsChart } from './EChartsChart'
 export { EChartsPieChart } from './EChartsPieChart'
